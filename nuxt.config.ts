@@ -1,10 +1,10 @@
 export default defineNuxtConfig({
     app: {
         head: {
-            title: 'Sales Admin | VRISTO - Multipurpose Tailwind Dashboard Template',
-            titleTemplate: '%s | VRISTO - Multipurpose Tailwind Dashboard Template',
+            title: 'P2P Exchange Admin | VRISTO Dashboard',
+            titleTemplate: '%s | P2P Exchange Admin',
             htmlAttrs: {
-                lang: 'en',
+                lang: 'th',
             },
             meta: [
                 { charset: 'utf-8' },
@@ -12,17 +12,31 @@ export default defineNuxtConfig({
                     name: 'viewport',
                     content: 'width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no',
                 },
-                { hid: 'description', name: 'description', content: '' },
+                { hid: 'description', name: 'description', content: 'P2P Exchange Admin Dashboard - จัดการระบบแลกเปลี่ยน USDT' },
                 { name: 'format-detection', content: 'telephone=no' },
             ],
             link: [
                 { rel: 'icon', type: 'image/x-icon', href: '/favicon.png' },
+                { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+                { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
                 {
                     rel: 'stylesheet',
                     href: 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap',
                 },
+                {
+                    rel: 'stylesheet',
+                    href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100;200;300;400;500;600;700;800;900&family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap',
+                },
             ],
         },
+    },
+
+    // Runtime Config for environment variables
+    runtimeConfig: {
+        public: {
+            supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL,
+            supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY,
+        }
     },
 
     css: ['~/assets/css/app.css'],
@@ -36,6 +50,7 @@ export default defineNuxtConfig({
 
     i18n: {
         locales: [
+            { code: 'th', file: 'th.json' },
             { code: 'da', file: 'da.json' },
             { code: 'de', file: 'de.json' },
             { code: 'el', file: 'fr.json' },
@@ -54,7 +69,7 @@ export default defineNuxtConfig({
             { code: 'ae', file: 'ae.json' },
         ],
         lazy: true,
-        defaultLocale: 'en',
+        defaultLocale: 'th',
         strategy: 'no_prefix',
         langDir: 'locales/',
     },

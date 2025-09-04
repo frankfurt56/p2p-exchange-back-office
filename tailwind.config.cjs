@@ -63,7 +63,9 @@ module.exports = {
                 },
             },
             fontFamily: {
-                nunito: ['Nunito', 'sans-serif'],
+                nunito: ['Nunito', 'Noto Sans Thai', 'Sarabun', 'sans-serif'],
+                thai: ['Noto Sans Thai', 'Sarabun', 'sans-serif'],
+                sarabun: ['Sarabun', 'Noto Sans Thai', 'sans-serif'],
             },
             spacing: {
                 4.5: '18px',

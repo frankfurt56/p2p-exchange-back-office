@@ -25,6 +25,7 @@
     "dependencies": {
         "@nuxt/types": "^2.18.1",
         "@pinia/nuxt": "^0.5.4",
+        "@supabase/supabase-js": "^2.57.0",
         "pinia": "^2.0.22",
         "vue-height-collapsible": "^0.1.1",
         "vue3-perfect-scrollbar": "^2.0.0",

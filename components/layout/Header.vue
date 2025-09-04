@@ -112,43 +112,6 @@
 
                     <div class="dropdown shrink-0">
                         <client-only>
-                            <Popper :placement="store.rtlClass === 'rtl' ? 'bottom-end' : 'bottom-start'" offsetDistance="8">
-                                <button
-                                    type="button"
-                                    class="block rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary dark:bg-dark/40 dark:hover:bg-dark/60"
-                                >
-                                    <img :src="currentFlag" alt="flag" class="h-5 w-5 rounded-full object-cover" />
-                                </button>
-                                <template #content="{ close }">
-                                    <ul
-                                        class="grid w-[280px] grid-cols-2 gap-2 !px-2 font-semibold text-dark dark:text-white-dark dark:text-white-light/90"
-                                        @click="close()"
-                                    >
-                                        <template v-for="item in store.languageList" :key="item.code">
-                                            <li>
-                                                <button
-                                                    type="button"
-                                                    class="w-full hover:text-primary"
-                                                    :class="{ 'bg-primary/10 text-primary': store.locale === item?.code }"
-                                                    @click="changeLanguage(item)"
-                                                >
-                                                    <img
-                                                        class="h-5 w-5 rounded-full object-cover"
-                                                        :src="`/assets/images/flags/${item.code.toUpperCase()}.svg`"
-                                                        alt=""
-                                                    />
-                                                    <span class="ltr:ml-3 rtl:mr-3">{{ item.name }}</span>
-                                                </button>
-                                            </li>
-                                        </template>
-                                    </ul>
-                                </template>
-                            </Popper>
-                        </client-only>
-                    </div>
-
-                    <div class="dropdown shrink-0">
-                        <client-only>
                             <Popper :placement="store.rtlClass === 'rtl' ? 'bottom-start' : 'bottom-end'" offsetDistance="8">
                                 <button
                                     type="button"
@@ -294,28 +257,24 @@
                         <client-only>
                             <Popper :placement="store.rtlClass === 'rtl' ? 'bottom-end' : 'bottom-start'" offsetDistance="8" class="!block">
                                 <button type="button" class="group relative block">
-                                    <img
-                                        class="h-9 w-9 rounded-full object-cover saturate-50 group-hover:saturate-100"
-                                        src="/assets/images/user-profile.jpeg"
-                                        alt=""
-                                    />
+                                    <div class="h-9 w-9 rounded-full bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center text-white font-bold text-sm saturate-50 group-hover:saturate-100 transition-all duration-200">
+                                        {{ (authStore.currentUser?.username || 'Admin').charAt(0).toUpperCase() }}
+                                    </div>
                                 </button>
                                 <template #content="{ close }">
                                     <ul class="w-[230px] !py-0 font-semibold text-dark dark:text-white-dark dark:text-white-light/90">
                                         <li>
                                             <div class="flex items-center px-4 py-4">
                                                 <div class="flex-none">
-                                                    <img class="h-10 w-10 rounded-md object-cover" src="/assets/images/user-profile.jpeg" alt="" />
+                                                    <div class="h-10 w-10 rounded-md bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center text-white font-bold text-lg">
+                                                        {{ (authStore.currentUser?.username || 'Admin').charAt(0).toUpperCase() }}
+                                                    </div>
                                                 </div>
                                                 <div class="truncate ltr:pl-4 rtl:pr-4">
                                                     <h4 class="text-base">
-                                                        John Doe<span class="rounded bg-success-light px-1 text-xs text-success ltr:ml-2 rtl:ml-2">Pro</span>
+                                                        {{ authStore.currentUser?.username || 'Admin' }}<span class="rounded bg-danger-light px-1 text-xs text-danger ltr:ml-2 rtl:ml-2">ADMIN</span>
                                                     </h4>
-                                                    <a
-                                                        class="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white"
-                                                        href="javascript:;"
-                                                        >johndoe@gmail.com</a
-                                                    >
+                                                    <p class="text-xs text-gray-500">{{ authStore.currentUser?.email || 'admin@p2p.com' }}</p>
                                                 </div>
                                             </div>
                                         </li>
@@ -341,11 +300,11 @@
                                             </NuxtLink>
                                         </li>
                                         <li class="border-t border-white-light dark:border-white-light/10">
-                                            <NuxtLink to="/auth/boxed-signin" class="!py-3 text-danger" @click="close()">
+                                            <a href="javascript:;" class="!py-3 text-danger" @click="handleLogout">
                                                 <icon-logout class="h-4.5 w-4.5 shrink-0 rotate-90 ltr:mr-2 rtl:ml-2" />
 
                                                 Sign Out
-                                            </NuxtLink>
+                                            </a>
                                         </li>
                                     </ul>
                                 </template>
@@ -880,18 +839,17 @@
 
     import { useRoute } from 'vue-router';
     import { useAppStore } from '@/stores/index';
+    import { useAdminAuthStore } from '@/stores/adminAuth';
+    
     const store = useAppStore();
+    const authStore = useAdminAuthStore();
     const route = useRoute();
     const search = ref(false);
-    const { setLocale } = useI18n();
 
-    // multi language
-    const changeLanguage = (item: any) => {
-        appSetting.toggleLanguage(item, setLocale);
+    // Admin logout handler
+    const handleLogout = async () => {
+        await authStore.logout();
     };
-    const currentFlag = computed(() => {
-        return `/assets/images/flags/${store.locale?.toUpperCase()}.svg`;
-    });
 
     const notifications = ref([
         {
