@@ -36,29 +36,14 @@
                             </li>
 
                             <li class="menu nav-item">
-                                <button
-                                    type="button"
-                                    class="nav-link group w-full"
-                                    :class="{ active: activeDropdown === 'users' }"
-                                    @click="activeDropdown === 'users' ? (activeDropdown = null) : (activeDropdown = 'users')"
-                                >
+                                <NuxtLink to="/users" class="nav-link group" @click="toggleMobileMenu">
                                     <div class="flex items-center">
                                         <icon-menu-users class="shrink-0 group-hover:!text-primary" />
                                         <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">
                                             จัดการผู้ใช้
                                         </span>
                                     </div>
-                                    <div :class="{ '-rotate-90 rtl:rotate-90': activeDropdown !== 'users' }">
-                                        <icon-caret-down />
-                                    </div>
-                                </button>
-                                <vue-collapsible :isOpen="activeDropdown === 'users'">
-                                    <ul class="sub-menu text-gray-500">
-                                        <li>
-                                            <NuxtLink to="/users" @click="toggleMobileMenu">รายการผู้ใช้</NuxtLink>
-                                        </li>
-                                    </ul>
-                                </vue-collapsible>
+                                </NuxtLink>
                             </li>
                         </ul>
                     </perfect-scrollbar>
@@ -70,7 +55,6 @@
 
 <script lang="ts" setup>
     import { ref, onMounted } from 'vue';
-    import VueCollapsible from 'vue-height-collapsible/vue3';
     
     import { useAppStore } from '@/stores/index';
     const store = useAppStore();
