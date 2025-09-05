@@ -81,7 +81,7 @@
                             v-model="searchTerm" 
                             type="text" 
                             class="form-input py-2 pl-10" 
-                            placeholder="ค้นหาชื่อผู้ใช้ หรือ อีเมล..."
+                            placeholder="ค้นหาชื่อผู้ใช้"
                         >
                     </div>
                 </div>
@@ -138,18 +138,12 @@
 
                 <template #role="{ row }">
                     <span 
-                        :class="{
-                            'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400': row.role === 'admin',
-                            'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400': row.role === 'moderator',
-                            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400': row.role === 'user'
-                        }"
+                        :class="row.role === 'admin' 
+                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' 
+                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400'"
                         class="px-2 py-1 text-xs rounded-full inline-flex items-center"
                     >
-                        {{ 
-                            row.role === 'admin' ? 'ผู้ดูแลระบบ' : 
-                            row.role === 'moderator' ? 'ผู้ควบคุม' : 
-                            'ผู้ใช้ทั่วไป' 
-                        }}
+                        {{ row.role === 'admin' ? 'ผู้ดูแลระบบ' : 'ผู้ใช้ทั่วไป' }}
                     </span>
                 </template>
 
@@ -253,7 +247,7 @@ const stats = computed(() => ({
     totalUsers: users.value.length,
     activeUsers: users.value.filter(u => u.is_active).length,
     bannedUsers: users.value.filter(u => !u.is_active).length,
-    adminUsers: users.value.filter(u => u.role === 'admin' || u.role === 'moderator').length
+    adminUsers: users.value.filter(u => u.role === 'admin').length
 }))
 
 const filteredUsers = computed(() => {
@@ -297,8 +291,7 @@ const statusOptions = [
 const roleFilterOptions = [
     { value: '', label: 'ทั้งหมด' },
     { value: 'admin', label: 'ผู้ดูแลระบบ' },
-    { value: 'user', label: 'ผู้ใช้ทั่วไป' },
-    { value: 'moderator', label: 'ผู้ควบคุม' }
+    { value: 'user', label: 'ผู้ใช้ทั่วไป' }
 ]
 
 
@@ -399,10 +392,18 @@ const fetchUsers = async () => {
 }
 
 const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('th-TH', {
+    // สร้าง Date object
+    const utcDate = new Date(dateString)
+    
+    // แปลงเป็นเวลาไทย
+    const thaiTime = new Date(utcDate.getTime() + (7 * 60 * 60 * 1000))
+    
+    // แสดงเฉพาะวันที่ (ไม่รวมเวลา)
+    return thaiTime.toLocaleDateString('th-TH', {
         year: 'numeric',
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
+        timeZone: 'UTC' // ใช้ UTC เพื่อไม่ให้แปลง timezone อีกครั้ง
     })
 }
 
