@@ -118,7 +118,7 @@
                         </div>
                         <div>
                             <div class="font-medium text-gray-900 dark:text-gray-100">{{ row.username }}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ row.email }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">ID: {{ row.id.slice(0, 8) }}...</div>
                         </div>
                     </div>
                 </template>
@@ -148,7 +148,6 @@
                 </template>
 
                 <template #created_at="{ row }">{{ formatDate(row.created_at) }}</template>
-                <template #last_transaction="{ row }">{{ row.last_transaction || 'ไม่มีธุรกรรม' }}</template>
 
                 <template #actions="{ row }">
                     <div class="flex items-center gap-2">
@@ -199,6 +198,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useAdminAuthStore } from '~/stores/adminAuth'
+import { supabase, type User } from '~/lib/supabase'
 import DataTable from '~/components/DataTable.vue'
 
 // Page Meta
@@ -220,39 +220,8 @@ const searchTerm = ref('')
 const statusFilter = ref('')
 const roleFilter = ref('')
 
-// Mock data - จะแทนที่ด้วย API จริงในภายหลัง
-const users = ref([
-    {
-        id: '1',
-        username: 'john_doe',
-        email: 'john@example.com',
-        full_name: 'John Doe',
-        role: 'user',
-        is_active: true,
-        created_at: '2024-01-15T10:30:00Z',
-        last_transaction: '2024-09-01'
-    },
-    {
-        id: '2', 
-        username: 'admin_user',
-        email: 'admin@p2p.com',
-        full_name: 'Admin User',
-        role: 'admin',
-        is_active: true,
-        created_at: '2024-01-01T08:00:00Z',
-        last_transaction: '2024-09-04'
-    },
-    {
-        id: '3',
-        username: 'jane_smith',
-        email: 'jane@example.com', 
-        full_name: 'Jane Smith',
-        role: 'user',
-        is_active: false,
-        created_at: '2024-02-20T14:20:00Z',
-        last_transaction: '2024-08-15'
-    }
-])
+// Users data from database
+const users = ref<User[]>([])
 
 const newUser = ref({
     username: '',
@@ -276,8 +245,7 @@ const filteredUsers = computed(() => {
     
     if (searchTerm.value) {
         filtered = filtered.filter(user => 
-            user.username.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchTerm.value.toLowerCase())
+            user.username.toLowerCase().includes(searchTerm.value.toLowerCase())
         )
     }
     
@@ -300,58 +268,9 @@ const tableColumns = [
     { key: 'status', label: 'สถานะ' },
     { key: 'role', label: 'บทบาท' },
     { key: 'created_at', label: 'วันที่สมัคร' },
-    { key: 'last_transaction', label: 'ธุรกรรมล่าสุด' },
     { key: 'actions', label: 'การกระทำ' },
 ]
 
-// Methods
-const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('th-TH', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    })
-}
-
-const createUser = async () => {
-    try {
-        creatingUser.value = true
-        
-        // Mock API call - จะแทนที่ด้วย API จริง
-        const mockUser = {
-            id: Date.now().toString(),
-            ...newUser.value,
-            created_at: new Date().toISOString(),
-            last_transaction: ''
-        }
-        
-        // สำหรับการใช้งานจริง ตรงนี้จะเรียก API เพื่อบันทึกข้อมูล
-        await new Promise(resolve => setTimeout(resolve, 800))
-        
-        users.value.push(mockUser)
-        
-        // Reset form
-        newUser.value = {
-            username: '',
-            email: '',
-            password: '',
-            full_name: '',
-            role: 'user',
-            is_active: true
-        }
-        
-        showAddModal.value = false
-        
-        // Show success message
-        toast.success('เพิ่มผู้ใช้เรียบร้อยแล้ว')
-        
-    } catch (error) {
-        console.error('Error creating user:', error)
-        toast.error('เกิดข้อผิดพลาดในการเพิ่มผู้ใช้')
-    } finally {
-        creatingUser.value = false
-    }
-}
 
 // Modal สำหรับแก้ไขผู้ใช้
 const showEditModal = ref(false)
@@ -372,34 +291,10 @@ const editUser = (user: any) => {
     showEditModal.value = true
 }
 
-const updateUser = async () => {
-    try {
-        updatingUser.value = true
-        
-        // สำหรับการใช้งานจริง ตรงนี้จะเรียก API เพื่อบันทึกข้อมูล
-        await new Promise(resolve => setTimeout(resolve, 800))
-        
-        // อัพเดตข้อมูลในตาราง
-        const index = users.value.findIndex(u => u.id === editingUser.value.id)
-        if (index !== -1) {
-            users.value[index] = { ...editingUser.value }
-        }
-        
-        // แสดงข้อความสำเร็จ
-        alert('บันทึกข้อมูลผู้ใช้เรียบร้อยแล้ว')
-        showEditModal.value = false
-    } catch (error) {
-        console.error('Error updating user:', error)
-        alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
-    } finally {
-        updatingUser.value = false
-    }
-}
 
-// Import หรือสร้าง toast service
 const toast = {
     success: (message: string) => {
-        alert(message) // ตอนนี้จะใช้ alert ไปก่อน แต่ในการใช้งานจริงควรใช้ toast component
+        alert(message) 
     },
     error: (message: string) => {
         alert(message)
@@ -456,12 +351,54 @@ const confirmDeleteUser = async () => {
     }
 }
 
+// Methods
+const fetchUsers = async () => {
+    try {
+        loading.value = true
+        console.log('Fetching users from database...')
+        
+        const { data, error } = await supabase
+            .from('users')
+            .select(`
+                id,
+                username,
+                password_hash,
+                is_active,
+                created_at,
+                updated_at,
+                role
+            `)
+            .order('created_at', { ascending: false })
+        
+        if (error) {
+            console.error('Supabase error:', error)
+            alert('เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้: ' + error.message)
+            return
+        }
+        
+        console.log('Fetched users:', data)
+        users.value = data || []
+        console.log('Total users loaded:', users.value.length)
+        
+    } catch (error) {
+        console.error('Error fetching users:', error)
+        alert('เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้')
+    } finally {
+        loading.value = false
+    }
+}
+
+const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('th-TH', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    })
+}
+
 // Lifecycle
 onMounted(async () => {
-    // Simulate loading
-    setTimeout(() => {
-        loading.value = false
-    }, 1000)
+    await fetchUsers()
 })
 </script>
 
