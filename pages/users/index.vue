@@ -7,8 +7,8 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">จัดการข้อมูลผู้ใช้ทั้งหมดในระบบ</p>
             </div>
             <button 
-                @click="showAddModal = true"
-                class="btn text-black rounded-md flex items-center gap-2 "
+                @click="openCreateModal"
+                class="btn px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md flex items-center gap-2 transition-colors"
             >
                 <icon-plus class="w-4 h-4" />
                 <span>เพิ่มผู้ใช้ใหม่</span>
@@ -89,21 +89,21 @@
                 <!-- Status Filter -->
                 <div class="md:col-span-3 lg:col-span-3">
                     <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block">สถานะ</label>
-                    <select v-model="statusFilter" class="form-select py-2">
-                        <option value="">ทั้งหมด</option>
-                        <option value="active">ใช้งานอยู่</option>
-                        <option value="inactive">ถูกระงับ</option>
-                    </select>
+                    <CustomDropdown 
+                        v-model="statusFilter"
+                        :options="statusOptions"
+                        placeholder="ทั้งหมด"
+                    />
                 </div>
                 
                 <!-- Role Filter -->
                 <div class="md:col-span-3 lg:col-span-3">
                     <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block">บทบาท</label>
-                    <select v-model="roleFilter" class="form-select py-2">
-                        <option value="">ทั้งหมด</option>
-                        <option value="admin">ผู้ดูแลระบบ</option>
-                        <option value="user">ผู้ใช้ทั่วไป</option>
-                    </select>
+                    <CustomDropdown 
+                        v-model="roleFilter"
+                        :options="roleFilterOptions"
+                        placeholder="ทั้งหมด"
+                    />
                 </div>
             </div>
         </div>
@@ -138,12 +138,18 @@
 
                 <template #role="{ row }">
                     <span 
-                        :class="row.role === 'admin' 
-                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' 
-                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400'"
+                        :class="{
+                            'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400': row.role === 'admin',
+                            'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400': row.role === 'moderator',
+                            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400': row.role === 'user'
+                        }"
                         class="px-2 py-1 text-xs rounded-full inline-flex items-center"
                     >
-                        {{ row.role === 'admin' ? 'ผู้ดูแลระบบ' : 'ผู้ใช้ทั่วไป' }}
+                        {{ 
+                            row.role === 'admin' ? 'ผู้ดูแลระบบ' : 
+                            row.role === 'moderator' ? 'ผู้ควบคุม' : 
+                            'ผู้ใช้ทั่วไป' 
+                        }}
                     </span>
                 </template>
 
@@ -152,7 +158,7 @@
                 <template #actions="{ row }">
                     <div class="flex items-center gap-2">
                         <button 
-                            @click="editUser(row)" 
+                            @click="openEditModal(row)" 
                             class="p-1.5 rounded-md text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-blue-500 transition-colors" 
                             title="แก้ไข"
                         >
@@ -181,7 +187,7 @@
                 </div>
                 <p class="text-gray-500 dark:text-gray-400">ไม่พบข้อมูลผู้ใช้</p>
                 <button 
-                    @click="showAddModal = true"
+                    @click="openCreateModal"
                     class="mt-4 px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 rounded-md text-sm transition-colors"
                 >
                     เพิ่มผู้ใช้ใหม่
@@ -189,9 +195,15 @@
             </div>
         </div>
 
-
-
-
+        <!-- User Modal Component -->
+        <UserModal
+            :is-open="showAddModal"
+            :mode="modalMode"
+            :user="selectedUser"
+            :loading="creatingUser"
+            @close="closeModal"
+            @submit="handleUserSubmit"
+        />
     </div>
 </template>
 
@@ -200,6 +212,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useAdminAuthStore } from '~/stores/adminAuth'
 import { supabase, type User } from '~/lib/supabase'
 import DataTable from '~/components/DataTable.vue'
+import UserModal from '~/components/UserModal.vue'
+import CustomDropdown from '~/components/CustomDropdown.vue'
 
 // Page Meta
 definePageMeta({
@@ -220,14 +234,16 @@ const searchTerm = ref('')
 const statusFilter = ref('')
 const roleFilter = ref('')
 
+// Modal state
+const modalMode = ref<'create' | 'edit'>('create')
+const selectedUser = ref<User | null>(null)
+
 // Users data from database
 const users = ref<User[]>([])
 
 const newUser = ref({
     username: '',
-    email: '',
     password: '',
-    full_name: '',
     role: 'user',
     is_active: true
 })
@@ -237,7 +253,7 @@ const stats = computed(() => ({
     totalUsers: users.value.length,
     activeUsers: users.value.filter(u => u.is_active).length,
     bannedUsers: users.value.filter(u => !u.is_active).length,
-    adminUsers: users.value.filter(u => u.role === 'admin').length
+    adminUsers: users.value.filter(u => u.role === 'admin' || u.role === 'moderator').length
 }))
 
 const filteredUsers = computed(() => {
@@ -271,25 +287,19 @@ const tableColumns = [
     { key: 'actions', label: 'การกระทำ' },
 ]
 
+// Dropdown options
+const statusOptions = [
+    { value: '', label: 'ทั้งหมด' },
+    { value: 'active', label: 'ใช้งานอยู่' },
+    { value: 'inactive', label: 'ถูกระงับ' }
+]
 
-// Modal สำหรับแก้ไขผู้ใช้
-const showEditModal = ref(false)
-const updatingUser = ref(false)
-const editingUser = ref({
-    id: '',
-    username: '',
-    email: '',
-    full_name: '',
-    role: 'user',
-    is_active: true,
-    created_at: '',
-    last_transaction: ''
-})
-
-const editUser = (user: any) => {
-    editingUser.value = { ...user }
-    showEditModal.value = true
-}
+const roleFilterOptions = [
+    { value: '', label: 'ทั้งหมด' },
+    { value: 'admin', label: 'ผู้ดูแลระบบ' },
+    { value: 'user', label: 'ผู้ใช้ทั่วไป' },
+    { value: 'moderator', label: 'ผู้ควบคุม' }
+]
 
 
 const toast = {
@@ -394,6 +404,160 @@ const formatDate = (dateString: string) => {
         month: 'short',
         day: 'numeric'
     })
+}
+
+// Modal functions
+const openCreateModal = () => {
+    modalMode.value = 'create'
+    selectedUser.value = null
+    showAddModal.value = true
+}
+
+const openEditModal = (user: User) => {
+    modalMode.value = 'edit'
+    selectedUser.value = user
+    showAddModal.value = true
+}
+
+const closeModal = () => {
+    showAddModal.value = false
+    selectedUser.value = null
+}
+
+const handleUserSubmit = async (userData: any) => {
+    if (modalMode.value === 'create') {
+        await createUserFromModal(userData)
+    } else {
+        await updateUserFromModal(userData)
+    }
+}
+
+const createUserFromModal = async (userData: any) => {
+    try {
+        creatingUser.value = true
+        console.log('Creating user:', userData.username)
+        
+        const { data, error } = await supabase
+            .from('users')
+            .insert([{
+                username: userData.username,
+                password_hash: userData.password, 
+                role: userData.role,
+                is_active: userData.is_active
+            }])
+            .select('id, username, role, is_active, created_at')
+        
+        if (error) {
+            console.error('Error creating user:', error)
+            if (error.code === '23505') {
+                alert('ชื่อผู้ใช้นี้มีอยู่แล้ว กรุณาเลือกชื่อผู้ใช้อื่น')
+            } else {
+                alert('เกิดข้อผิดพลาดในการสร้างผู้ใช้: ' + error.message)
+            }
+            return
+        }
+        
+        console.log('User created successfully:', data)
+        closeModal()
+        await fetchUsers()
+        alert('สร้างผู้ใช้เรียบร้อยแล้ว')
+        
+    } catch (error) {
+        console.error('Error creating user:', error)
+        alert('เกิดข้อผิดพลาดในการสร้างผู้ใช้')
+    } finally {
+        creatingUser.value = false
+    }
+}
+
+const updateUserFromModal = async (userData: any) => {
+    try {
+        creatingUser.value = true
+        console.log('Updating user:', userData.username)
+        
+        const updateData: any = {
+            role: userData.role,
+            is_active: userData.is_active
+        }
+        
+        // Only include password if it's provided
+        if (userData.password && userData.password.trim() !== '') {
+            updateData.password_hash = userData.password
+        }
+        
+        const { error } = await supabase
+            .from('users')
+            .update(updateData)
+            .eq('id', userData.id)
+        
+        if (error) {
+            console.error('Error updating user:', error)
+            alert('เกิดข้อผิดพลาดในการอัพเดตผู้ใช้: ' + error.message)
+            return
+        }
+        
+        console.log('User updated successfully')
+        closeModal()
+        await fetchUsers()
+        alert('อัพเดตข้อมูลผู้ใช้เรียบร้อยแล้ว')
+        
+    } catch (error) {
+        console.error('Error updating user:', error)
+        alert('เกิดข้อผิดพลาดในการอัพเดตผู้ใช้')
+    } finally {
+        creatingUser.value = false
+    }
+}
+
+const createUser = async () => {
+    try {
+        creatingUser.value = true
+        console.log('Creating user:', newUser.value.username)
+        
+        const { data, error } = await supabase
+            .from('users')
+            .insert([{
+                username: newUser.value.username,
+                password_hash: newUser.value.password, 
+                role: newUser.value.role,
+                is_active: newUser.value.is_active
+            }])
+            .select('id, username, role, is_active, created_at')
+        
+        if (error) {
+            console.error('Error creating user:', error)
+            if (error.code === '23505') {
+                alert('ชื่อผู้ใช้นี้มีอยู่แล้ว กรุณาเลือกชื่อผู้ใช้อื่น')
+            } else {
+                alert('เกิดข้อผิดพลาดในการสร้างผู้ใช้: ' + error.message)
+            }
+            return
+        }
+        
+        console.log('User created successfully:', data)
+        
+        // Reset form
+        newUser.value = {
+            username: '',
+            password: '',
+            role: 'user',
+            is_active: true
+        }
+        
+        // Close modal
+        showAddModal.value = false
+        
+        // Refresh users list
+        await fetchUsers()
+        
+        alert('สร้างผู้ใช้เรียบร้อยแล้ว')
+        
+    } catch (error) {
+        console.error('Error creating user:', error)
+        alert('เกิดข้อผิดพลาดในการสร้างผู้ใช้')
+    } finally {
+        creatingUser.value = false
+    }
 }
 
 // Lifecycle
