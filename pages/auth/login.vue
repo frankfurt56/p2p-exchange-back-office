@@ -21,36 +21,36 @@
                     <form @submit.prevent="handleLogin" class="space-y-5 dark:text-white">
                         <!-- Username Field -->
                         <div>
-                            <label for="username" class="dark:text-white">ชื่อผู้ใช้</label>
+                            <label for="username" class="dark:text-white mb-2 block">ชื่อผู้ใช้</label>
                             <div class="relative text-white-dark">
                                 <input
                                     id="username"
                                     v-model="form.username"
                                     type="text"
                                     placeholder="กรอกชื่อผู้ใช้"
-                                    class="form-input ps-10 placeholder:text-white-dark"
+                                    class="form-input !pl-12 pr-4 placeholder:text-white-dark"
                                     required
                                 />
-                                <span class="absolute start-4 top-1/2 -translate-y-1/2">
-                                    <icon-user :fill="true" />
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                                    <icon-user :fill="true" class="w-5 h-5" />
                                 </span>
                             </div>
                         </div>
 
                         <!-- Password Field -->
                         <div>
-                            <label for="password" class="dark:text-white">รหัสผ่าน</label>
+                            <label for="password" class="dark:text-white mb-2 block">รหัสผ่าน</label>
                             <div class="relative text-white-dark">
                                 <input
                                     id="password"
                                     v-model="form.password"
                                     type="password"
                                     placeholder="กรอกรหัสผ่าน"
-                                    class="form-input ps-10 placeholder:text-white-dark"
+                                    class="form-input !pl-12 pr-4 placeholder:text-white-dark"
                                     required
                                 />
-                                <span class="absolute start-4 top-1/2 -translate-y-1/2">
-                                    <icon-lock-dots :fill="true" />
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10">
+                                    <icon-lock-dots :fill="true" class="w-5 h-5" />
                                 </span>
                             </div>
                         </div>
@@ -195,12 +195,15 @@ const handleLogin = async () => {
     border-radius: 0.5rem;
     border: 1px solid rgba(224, 230, 237, 1);
     background-color: white;
-    padding: 0.625rem 1rem;
+    padding: 0.75rem 1rem;
     color: black;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
 }
 
 .form-input::placeholder {
-    color: #506690;
+    color: #9ca3af;
+    opacity: 0.7;
 }
 
 .form-input:focus {
@@ -210,9 +213,13 @@ const handleLogin = async () => {
 }
 
 .dark .form-input {
-    border-color: #17263c;
-    background-color: #121e32;
-    color: #506690;
+    border-color: #374151;
+    background-color: #1f2937;
+    color: #e5e7eb;
+}
+
+.dark .form-input::placeholder {
+    color: #6b7280;
 }
 
 .form-checkbox {
