@@ -1,8 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 
 // ตรวจสอบว่าอยู่ใน browser หรือไม่
-const supabaseUrl = typeof window !== 'undefined' 
-  ? 'https://nmqlvnzeaotmjzscxphg.supabase.co'
+const supabaseUrl = typeof window !== 'undefined'
+  ? window.location.protocol + '//' + window.location.hostname.includes('localhost') 
+    ? 'https://nmqlvnzeaotmjzscxphg.supabase.co'
+    : 'https://nmqlvnzeaotmjzscxphg.supabase.co'
   : process.env.NUXT_PUBLIC_SUPABASE_URL || 'https://nmqlvnzeaotmjzscxphg.supabase.co'
 
 const supabaseAnonKey = typeof window !== 'undefined'
@@ -37,17 +39,30 @@ export interface Transaction {
   from_amount: number
   to_amount: number
   exchange_rate: number
-  network: string
-  from_wallet_address?: string
-  to_wallet_address?: string
-  txid?: string
-  slip_upload_url?: string
+  selected_network: string
+  recipient_wallet_address: string
+  payment_slip_url?: string
   txid_screenshot_url?: string
+  customer_bank_code?: string
+  customer_account_number?: string
+  customer_account_name?: string
+  customer_receive_bank_code?: string
+  customer_receive_account_number?: string
+  customer_receive_account_name?: string
   customer_receive_bank_accounts?: Record<string, unknown>
-  status: 'pending' | 'processing' | 'completed' | 'cancelled' | 'expired'
+  usdt_from_wallet_address?: string
+  usdt_transfer_hash?: string
+  usdt_transferred_at?: string
+  admin_reviewed_by?: string
+  admin_reviewed_at?: string
   admin_notes?: string
+  status: 'pending' | 'processing' | 'completed' | 'cancelled'
+  submitted_at?: string
+  submitted_at_th?: string
   created_at: string
   updated_at: string
+  created_at_th?: string
+  updated_at_th?: string
 }
 
 export interface BankAccount {
@@ -140,10 +155,13 @@ export const adminAPI = {
     return data as Transaction[]
   },
 
-  async updateTransactionStatus(orderReference: string, status: string, adminNotes?: string) {
+  async updateTransactionStatus(transactionId: string, status: string, adminNotes?: string) {
     const updateData: Record<string, any> = { 
       status,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      admin_reviewed_at: new Date().toISOString()
+      // TODO: Add admin_reviewed_by when we have proper admin user UUID
+      // admin_reviewed_by: adminUserId
     }
     
     if (adminNotes) {
@@ -153,11 +171,12 @@ export const adminAPI = {
     const { data, error } = await supabase
       .from('transactions')
       .update(updateData)
-      .eq('order_reference', orderReference)
+      .eq('id', transactionId)
       .select()
+      .single()
     
     if (error) throw error
-    return data[0]
+    return data as Transaction
   },
 
   async getTransactionByReference(orderReference: string) {

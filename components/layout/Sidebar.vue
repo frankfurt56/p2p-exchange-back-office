@@ -45,6 +45,17 @@
                                     </div>
                                 </NuxtLink>
                             </li>
+
+                            <li class="menu nav-item">
+                                <NuxtLink to="/transactions" class="nav-link group" @click="toggleMobileMenu">
+                                    <div class="flex items-center">
+                                        <icon-menu-invoice class="shrink-0 group-hover:!text-primary" />
+                                        <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">
+                                            จัดการธุรกรรม
+                                        </span>
+                                    </div>
+                                </NuxtLink>
+                            </li>
                         </ul>
                     </perfect-scrollbar>
                 </client-only>
