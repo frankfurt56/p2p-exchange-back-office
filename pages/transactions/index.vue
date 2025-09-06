@@ -21,23 +21,21 @@
                 <!-- Status Filter -->
                 <div>
                     <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block">สถานะ</label>
-                    <select v-model="statusFilter" class="form-select">
-                        <option value="">ทั้งหมด</option>
-                        <option value="pending">รอดำเนินการ</option>
-                        <option value="processing">กำลังดำเนินการ</option>
-                        <option value="completed">เสร็จสิ้น</option>
-                        <option value="cancelled">ยกเลิก</option>
-                    </select>
+                    <CustomDropdown 
+                        v-model="statusFilter"
+                        :options="statusOptions"
+                        placeholder="ทั้งหมด"
+                    />
                 </div>
 
                 <!-- Type Filter -->
                 <div>
                     <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block">ประเภท</label>
-                    <select v-model="typeFilter" class="form-select">
-                        <option value="">ทั้งหมด</option>
-                        <option value="buy">ซื้อ USDT</option>
-                        <option value="sell">ขาย USDT</option>
-                    </select>
+                    <CustomDropdown 
+                        v-model="typeFilter"
+                        :options="typeOptions"
+                        placeholder="ทั้งหมด"
+                    />
                 </div>
 
                 <!-- Actions -->
@@ -422,16 +420,11 @@
                         <!-- New Status Selection -->
                         <div>
                             <label class="text-sm text-gray-600 dark:text-gray-400 block mb-2">เปลี่ยนเป็นสถานะ</label>
-                            <select v-model="newStatus" class="form-select w-full">
-                                <option value="">-- เลือกสถานะใหม่ --</option>
-                                <option 
-                                    v-for="status in getAvailableStatuses(selectedTransactionForStatus.status)" 
-                                    :key="status.value" 
-                                    :value="status.value"
-                                >
-                                    {{ status.label }}
-                                </option>
-                            </select>
+                            <CustomDropdown
+                                v-model="newStatus" 
+                                :options="getAvailableStatuses(selectedTransactionForStatus.status)"
+                                placeholder="-- เลือกสถานะใหม่ --"
+                            />
                         </div>
 
                         <!-- Admin Notes -->
@@ -529,6 +522,7 @@ import { ref, computed, onMounted } from 'vue'
 import { adminAPI, type Transaction } from '~/lib/supabase'
 import { formatDate } from '~/utils/dateFormatter'
 import DataTable from '~/components/DataTable.vue'
+import CustomDropdown from '~/components/CustomDropdown.vue'
 
 // Page Meta
 definePageMeta({
@@ -571,6 +565,21 @@ const tableColumns = [
     { key: 'created_at', label: 'วันที่สร้าง' },
     { key: 'files', label: 'ไฟล์' },
     { key: 'actions', label: 'การกระทำ' },
+]
+
+// Dropdown options
+const statusOptions = [
+    { value: '', label: 'ทั้งหมด' },
+    { value: 'pending', label: 'รอดำเนินการ' },
+    { value: 'processing', label: 'กำลังดำเนินการ' },
+    { value: 'completed', label: 'เสร็จสิ้น' },
+    { value: 'cancelled', label: 'ยกเลิก' }
+]
+
+const typeOptions = [
+    { value: '', label: 'ทั้งหมด' },
+    { value: 'buy', label: 'ซื้อ USDT' },
+    { value: 'sell', label: 'ขาย USDT' }
 ]
 
 // Computed
