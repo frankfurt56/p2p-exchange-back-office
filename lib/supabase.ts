@@ -36,32 +36,37 @@ export interface Transaction {
   transaction_type: 'buy' | 'sell'
   from_currency: string
   to_currency: string
-  from_amount: number
-  to_amount: number
-  exchange_rate: number
+  from_amount: number | string
+  to_amount: number | string
+  exchange_rate: number | string
+  status: string
   selected_network: string
-  recipient_wallet_address: string
-  payment_slip_url?: string
-  txid_screenshot_url?: string
+  recipient_wallet_address?: string
   customer_bank_code?: string
   customer_account_number?: string
   customer_account_name?: string
   customer_receive_bank_code?: string
   customer_receive_account_number?: string
   customer_receive_account_name?: string
-  customer_receive_bank_accounts?: Record<string, unknown>
+  customer_receive_bank_accounts?: Array<{
+    bank: string
+    amount: string
+    accountName: string
+    accountNumber: string
+  }>
+  payment_slip_url?: string
   usdt_from_wallet_address?: string
   usdt_transfer_hash?: string
   usdt_transferred_at?: string
+  txid_screenshot_url?: string
+  submitted_at?: string
+  submitted_at_th?: string
   admin_reviewed_by?: string
   admin_reviewed_at?: string
   admin_notes?: string
-  status: 'pending' | 'processing' | 'completed' | 'cancelled'
-  submitted_at?: string
-  submitted_at_th?: string
   created_at: string
-  updated_at: string
   created_at_th?: string
+  updated_at?: string
   updated_at_th?: string
 }
 

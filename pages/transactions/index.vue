@@ -494,15 +494,36 @@
 
         <!-- Image Preview Modal -->
         <div v-if="showImageModal" class="fixed inset-0 z-50 overflow-y-auto">
-            <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="flex items-center justify-center min-h-screen px-4 py-8">
                 <div class="fixed inset-0 bg-black opacity-75" @click="closeImageModal"></div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl z-10">
-                    <h3 class="text-lg font-semibold mb-4">{{ imageModalTitle }}</h3>
-                    <img :src="imageModalUrl" class="w-full h-auto rounded" />
-                    <div class="flex justify-end mt-4">
-                        <button @click="closeImageModal" class="btn btn-outline-primary">
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-3xl z-10 max-h-[90vh] overflow-y-auto">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">{{ imageModalTitle }}</h3>
+                        <button @click="closeImageModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-center bg-gray-100 dark:bg-gray-900 rounded-lg p-4">
+                        <img 
+                            :src="imageModalUrl" 
+                            class="max-w-full max-h-[60vh] w-auto h-auto rounded shadow-lg object-contain" 
+                            alt="หลักฐาน"
+                            style="max-height: 60vh;"
+                        />
+                    </div>
+                    <div class="flex justify-center mt-4 gap-2">
+                        <button @click="closeImageModal" class="btn btn-outline-primary px-6">
                             ปิด
                         </button>
+                        <a 
+                            :href="imageModalUrl" 
+                            target="_blank" 
+                            class="btn btn-primary px-6"
+                        >
+                            ดูขนาดเต็ม
+                        </a>
                     </div>
                 </div>
             </div>
