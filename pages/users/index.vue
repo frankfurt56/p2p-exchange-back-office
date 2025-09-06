@@ -198,6 +198,20 @@
             @close="closeModal"
             @submit="handleUserSubmit"
         />
+
+        <!-- Confirm Delete Dialog -->
+        <ConfirmDialog
+            :is-open="showDeleteModal"
+            :loading="deletingUser"
+            title="ยืนยันการลบผู้ใช้"
+            :message="`คุณต้องการลบผู้ใช้ '${userToDelete?.username}' หรือไม่? การดำเนินการนี้ไม่สามารถยกเลิกได้`"
+            confirm-text="ลบ"
+            cancel-text="ยกเลิก"
+            loading-text="กำลังลบ..."
+            type="danger"
+            @confirm="confirmDeleteUser"
+            @cancel="cancelDeleteUser"
+        />
     </div>
 </template>
 
@@ -208,6 +222,7 @@ import { supabase, type User } from '~/lib/supabase'
 import DataTable from '~/components/DataTable.vue'
 import UserModal from '~/components/UserModal.vue'
 import CustomDropdown from '~/components/CustomDropdown.vue'
+import ConfirmDialog from '~/components/ConfirmDialog.vue'
 
 // Page Meta
 definePageMeta({
@@ -335,23 +350,46 @@ const confirmDeleteUser = async () => {
     try {
         deletingUser.value = true
         
-        // สำหรับการใช้งานจริง ตรงนี้จะเรียก API เพื่อลบข้อมูล
-        await new Promise(resolve => setTimeout(resolve, 800))
-        
-        // ลบข้อมูลในตาราง
-        const index = users.value.findIndex(u => u.id === userToDelete.value.id)
-        if (index > -1) {
-            users.value.splice(index, 1)
-            alert('ลบผู้ใช้เรียบร้อยแล้ว')
+        if (!userToDelete.value) {
+            console.error('No user selected for deletion')
+            return
         }
         
+        console.log('Deleting user:', userToDelete.value.username)
+        
+        const { error } = await supabase
+            .from('users')
+            .delete()
+            .eq('id', userToDelete.value.id)
+        
+        if (error) {
+            console.error('Error deleting user:', error)
+            alert('เกิดข้อผิดพลาดในการลบผู้ใช้: ' + error.message)
+            return
+        }
+        
+        console.log('User deleted successfully')
+        
+        // Close modal
         showDeleteModal.value = false
+        
+        // Refresh users list
+        await fetchUsers()
+        
+        alert(`ลบผู้ใช้ '${userToDelete.value.username}' เรียบร้อยแล้ว`)
+        
     } catch (error) {
         console.error('Error deleting user:', error)
-        alert('เกิดข้อผิดพลาดในการลบข้อมูล')
+        alert('เกิดข้อผิดพลาดในการลบผู้ใช้')
     } finally {
         deletingUser.value = false
+        userToDelete.value = null
     }
+}
+
+const cancelDeleteUser = () => {
+    showDeleteModal.value = false
+    userToDelete.value = null
 }
 
 // Methods
