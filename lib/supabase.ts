@@ -85,9 +85,10 @@ export interface BankAccount {
 
 export interface UsdtPrice {
   id: number
-  buy_price: number
-  sell_price: number
+  buy_price: string | number
+  sell_price: string | number
   updated_at: string
+  updated_at_th?: string
 }
 
 export interface SystemSetting {
@@ -274,7 +275,8 @@ export const adminAPI = {
   },
 
   // USDT Price Management
-  async getUsdtPrice() {
+  // USDT Price Management
+  async getCurrentUsdtPrice() {
     const { data, error } = await supabase
       .from('usdt_price')
       .select('*')
@@ -286,17 +288,21 @@ export const adminAPI = {
     return data as UsdtPrice
   },
 
-  async updateUsdtPrice(buyPrice: number, sellPrice: number) {
+  async updateUsdtPrice(buyPrice: string | number, sellPrice: string | number) {
+    // Update existing record (assuming there's only one current price record)
     const { data, error } = await supabase
       .from('usdt_price')
-      .insert({
-        buy_price: buyPrice,
-        sell_price: sellPrice,
+      .update({
+        buy_price: buyPrice.toString(),
+        sell_price: sellPrice.toString(),
         updated_at: new Date().toISOString()
+        // updated_at_th will be automatically updated by database trigger/default
       })
+      .eq('id', 1) // Assuming id=1 is the current price record
       .select()
+      .single()
     
     if (error) throw error
-    return data[0]
+    return data as UsdtPrice
   }
 }

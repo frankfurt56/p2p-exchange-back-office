@@ -134,7 +134,7 @@
                 <p class="text-white-dark">ดูรายชื่อ เปิด/ปิด และจัดการบัญชีผู้ใช้</p>
             </NuxtLink>
 
-            <NuxtLink to="/settings" class="panel hover:shadow-lg transition-shadow cursor-pointer">
+            <NuxtLink to="/usdt-price" class="panel hover:shadow-lg transition-shadow cursor-pointer">
                 <div class="flex items-center justify-between mb-5">
                     <h5 class="font-semibold text-lg dark:text-white-light">การตั้งค่า</h5>
                     <div class="text-success">
