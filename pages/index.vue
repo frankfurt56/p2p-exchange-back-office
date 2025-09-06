@@ -7,43 +7,102 @@
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
             <!-- Total Transactions -->
-            <div class="panel bg-gradient-to-r from-cyan-500 to-cyan-400 text-white">
-                <div class="flex justify-between">
+            <div class="panel bg-gradient-to-r from-blue-500 to-blue-400 text-white">
+                <div class="flex justify-between items-center">
                     <div class="ltr:mr-1 rtl:ml-1 text-md font-semibold">ธุรกรรมทั้งหมด</div>
+                    <div class="p-3 rounded-full bg-white/20">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                    </div>
                 </div>
                 <div class="flex items-center mt-5">
                     <div class="text-3xl font-bold ltr:mr-3 rtl:ml-3">{{ dashboardData.totalTransactions || 0 }}</div>
                 </div>
+                <div class="text-white/80 text-sm mt-1">รายการทั้งหมด</div>
             </div>
 
             <!-- Total Users -->
-            <div class="panel bg-gradient-to-r from-violet-500 to-violet-400 text-white">
-                <div class="flex justify-between">
+            <div class="panel bg-gradient-to-r from-purple-500 to-purple-400 text-white">
+                <div class="flex justify-between items-center">
                     <div class="ltr:mr-1 rtl:ml-1 text-md font-semibold">ผู้ใช้ทั้งหมด</div>
+                    <div class="p-3 rounded-full bg-white/20">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </div>
                 </div>
                 <div class="flex items-center mt-5">
                     <div class="text-3xl font-bold ltr:mr-3 rtl:ml-3">{{ dashboardData.totalUsers || 0 }}</div>
                 </div>
+                <div class="text-white/80 text-sm mt-1">สมาชิกในระบบ</div>
             </div>
 
             <!-- Pending Transactions -->
-            <div class="panel bg-gradient-to-r from-blue-500 to-blue-400 text-white">
-                <div class="flex justify-between">
+            <div class="panel bg-gradient-to-r from-orange-500 to-orange-400 text-white">
+                <div class="flex justify-between items-center">
                     <div class="ltr:mr-1 rtl:ml-1 text-md font-semibold">รอดำเนินการ</div>
+                    <div class="p-3 rounded-full bg-white/20">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
                 </div>
                 <div class="flex items-center mt-5">
                     <div class="text-3xl font-bold ltr:mr-3 rtl:ml-3">{{ dashboardData.pending || 0 }}</div>
                 </div>
+                <div class="text-white/80 text-sm mt-1">ต้องตรวจสอบ</div>
             </div>
 
             <!-- Completed Transactions -->
-            <div class="panel bg-gradient-to-r from-fuchsia-500 to-fuchsia-400 text-white">
-                <div class="flex justify-between">
+            <div class="panel bg-gradient-to-r from-green-500 to-green-400 text-white">
+                <div class="flex justify-between items-center">
                     <div class="ltr:mr-1 rtl:ml-1 text-md font-semibold">สำเร็จแล้ว</div>
+                    <div class="p-3 rounded-full bg-white/20">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
                 </div>
                 <div class="flex items-center mt-5">
                     <div class="text-3xl font-bold ltr:mr-3 rtl:ml-3">{{ dashboardData.completed || 0 }}</div>
                 </div>
+                <div class="text-white/80 text-sm mt-1">เสร็จสมบูรณ์</div>
+            </div>
+        </div>
+
+        <!-- Additional Stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+            <!-- Processing Transactions -->
+            <div class="panel bg-gradient-to-r from-indigo-500 to-indigo-400 text-white">
+                <div class="flex justify-between items-center">
+                    <div class="ltr:mr-1 rtl:ml-1 text-md font-semibold">กำลังดำเนินการ</div>
+                    <div class="p-3 rounded-full bg-white/20">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex items-center mt-5">
+                    <div class="text-3xl font-bold ltr:mr-3 rtl:ml-3">{{ dashboardData.processing || 0 }}</div>
+                </div>
+                <div class="text-white/80 text-sm mt-1">อยู่ระหว่างการทำรายการ</div>
+            </div>
+
+            <!-- Cancelled Transactions -->
+            <div class="panel bg-gradient-to-r from-red-500 to-red-400 text-white">
+                <div class="flex justify-between items-center">
+                    <div class="ltr:mr-1 rtl:ml-1 text-md font-semibold">ยกเลิกแล้ว</div>
+                    <div class="p-3 rounded-full bg-white/20">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex items-center mt-5">
+                    <div class="text-3xl font-bold ltr:mr-3 rtl:ml-3">{{ dashboardData.cancelled || 0 }}</div>
+                </div>
+                <div class="text-white/80 text-sm mt-1">รายการที่ไม่สำเร็จ</div>
             </div>
         </div>
 
@@ -138,6 +197,14 @@ const dashboardData = ref({
 })
 
 // Methods
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('th-TH', {
+    style: 'decimal',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount)
+}
+
 const loadDashboardData = async () => {
   try {
     loading.value = true
