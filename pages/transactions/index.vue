@@ -265,9 +265,9 @@
                                     <p class="font-medium">{{ formatDate(selectedTransaction.created_at) }}</p>
                                 </div>
 
-                                <div v-if="selectedTransaction.updated_at">
+                                <div v-if="selectedTransaction.updated_at_th || selectedTransaction.updated_at">
                                     <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">วันที่อัพเดท</label>
-                                    <p class="font-medium">{{ formatDate(selectedTransaction.updated_at) }}</p>
+                                    <p class="font-medium">{{ formatDate(selectedTransaction.updated_at_th || selectedTransaction.updated_at) }}</p>
                                 </div>
                             </div>
 
@@ -291,8 +291,15 @@
                                 </div>
 
                                 <div v-if="selectedTransaction.recipient_wallet_address">
-                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">Wallet Address ปลายทาง</label>
+                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">
+                                        {{ selectedTransaction.transaction_type === 'buy' ? 'Wallet Address ปลายทาง' : 'Customer Wallet Address' }}
+                                    </label>
                                     <p class="font-mono text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded break-all">{{ selectedTransaction.recipient_wallet_address }}</p>
+                                </div>
+
+                                <div v-if="selectedTransaction.transaction_type === 'sell' && selectedTransaction.admin_wallet_address">
+                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">Admin Wallet Address</label>
+                                    <p class="font-mono text-sm bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 p-2 rounded break-all">{{ selectedTransaction.admin_wallet_address }}</p>
                                 </div>
 
                                 <div v-if="selectedTransaction.usdt_from_wallet_address">
@@ -330,40 +337,6 @@
                                         <p class="text-sm text-gray-600 dark:text-gray-400">{{ selectedTransaction.customer_receive_bank_code }}</p>
                                         <p class="font-mono text-sm">{{ selectedTransaction.customer_receive_account_number }}</p>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Transfer Details -->
-                        <div v-if="selectedTransaction.usdt_transferred_at || selectedTransaction.submitted_at" class="space-y-4">
-                            <h5 class="font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">ข้อมูลการโอน</h5>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div v-if="selectedTransaction.submitted_at">
-                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">วันที่ submit</label>
-                                    <p class="font-medium">{{ formatDate(selectedTransaction.submitted_at) }}</p>
-                                </div>
-
-                                <div v-if="selectedTransaction.usdt_transferred_at">
-                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">วันที่โอน USDT</label>
-                                    <p class="font-medium">{{ formatDate(selectedTransaction.usdt_transferred_at) }}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Admin Review -->
-                        <div v-if="selectedTransaction.admin_reviewed_by || selectedTransaction.admin_reviewed_at" class="space-y-4">
-                            <h5 class="font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">การตรวจสอบของแอดมิน</h5>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div v-if="selectedTransaction.admin_reviewed_by">
-                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">ตรวจสอบโดย</label>
-                                    <p class="font-medium">{{ selectedTransaction.admin_reviewed_by }}</p>
-                                </div>
-
-                                <div v-if="selectedTransaction.admin_reviewed_at">
-                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">วันที่ตรวจสอบ</label>
-                                    <p class="font-medium">{{ formatDate(selectedTransaction.admin_reviewed_at) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -541,6 +514,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAdminAuthStore } from '~/stores/adminAuth'
 import { adminAPI, type Transaction } from '~/lib/supabase'
+import { formatDate } from '~/utils/dateFormatter'
 import DataTable from '~/components/DataTable.vue'
 
 // Page Meta
@@ -644,16 +618,6 @@ const formatCurrency = (amount: number | string) => {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     }).format(num)
-}
-
-const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('th-TH', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    })
 }
 
 const getStatusClasses = (status: string) => {

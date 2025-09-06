@@ -219,6 +219,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAdminAuthStore } from '~/stores/adminAuth'
 import { supabase, type User } from '~/lib/supabase'
+import { formatDate } from '~/utils/dateFormatter'
 import DataTable from '~/components/DataTable.vue'
 import UserModal from '~/components/UserModal.vue'
 import CustomDropdown from '~/components/CustomDropdown.vue'
@@ -427,22 +428,6 @@ const fetchUsers = async () => {
     } finally {
         loading.value = false
     }
-}
-
-const formatDate = (dateString: string) => {
-    // สร้าง Date object
-    const utcDate = new Date(dateString)
-    
-    // แปลงเป็นเวลาไทย
-    const thaiTime = new Date(utcDate.getTime() + (7 * 60 * 60 * 1000))
-    
-    // แสดงเฉพาะวันที่ (ไม่รวมเวลา)
-    return thaiTime.toLocaleDateString('th-TH', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        timeZone: 'UTC' // ใช้ UTC เพื่อไม่ให้แปลง timezone อีกครั้ง
-    })
 }
 
 // Modal functions
