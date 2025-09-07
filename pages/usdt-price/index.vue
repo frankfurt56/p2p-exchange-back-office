@@ -20,45 +20,45 @@
 
         <!-- Current Price Display -->
         <div v-if="!loading && currentPrice" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <!-- Buy Price Card -->
-            <div class="panel border border-gray-200 dark:border-gray-700">
-                <div class="flex items-center">
-                    <span class="bg-green-100 p-4 rounded-full mr-4 dark:bg-green-900/30">
-                        <svg class="w-8 h-8 text-green-500 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                        </svg>
-                    </span>
-                    <div class="flex-1">
-                        <h3 class="text-sm text-gray-600 dark:text-gray-400 mb-1">ราคาซื้อ USDT</h3>
-                        <p class="text-3xl font-bold text-green-600 dark:text-green-400">
-                            ฿{{ formatCurrency(currentPrice.buy_price) }}
-                        </p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            ต่อ 1 USDT
-                        </p>
-                    </div>
+        <!-- Buy Price Card -->
+        <div class="panel border border-gray-200 dark:border-gray-700">
+            <div class="flex items-center">
+                <span class="bg-green-100 p-4 rounded-full mr-4 dark:bg-green-900/30">
+                    <svg class="w-8 h-8 text-green-500 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                    </svg>
+                </span>
+                <div class="flex-1">
+                    <h3 class="text-sm text-gray-600 dark:text-gray-400 mb-1">ราคาซื้อ USDT</h3>
+                    <p class="text-3xl font-bold text-green-600 dark:text-green-400">
+                        ฿{{ formatCurrency(currentPrice.buy_price) }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        ราคาที่คุณขาย USDT ให้ลูกค้า
+                    </p>
                 </div>
             </div>
+        </div>
 
-            <!-- Sell Price Card -->
-            <div class="panel border border-gray-200 dark:border-gray-700">
-                <div class="flex items-center">
-                    <span class="bg-red-100 p-4 rounded-full mr-4 dark:bg-red-900/30">
-                        <svg class="w-8 h-8 text-red-500 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                        </svg>
-                    </span>
-                    <div class="flex-1">
-                        <h3 class="text-sm text-gray-600 dark:text-gray-400 mb-1">ราคาขาย USDT</h3>
-                        <p class="text-3xl font-bold text-red-600 dark:text-red-400">
-                            ฿{{ formatCurrency(currentPrice.sell_price) }}
-                        </p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            ต่อ 1 USDT
-                        </p>
-                    </div>
+        <!-- Sell Price Card -->
+        <div class="panel border border-gray-200 dark:border-gray-700">
+            <div class="flex items-center">
+                <span class="bg-red-100 p-4 rounded-full mr-4 dark:bg-red-900/30">
+                    <svg class="w-8 h-8 text-red-500 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                    </svg>
+                </span>
+                <div class="flex-1">
+                    <h3 class="text-sm text-gray-600 dark:text-gray-400 mb-1">ราคาขาย USDT</h3>
+                    <p class="text-3xl font-bold text-red-600 dark:text-red-400">
+                        ฿{{ formatCurrency(currentPrice.sell_price) }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        ราคาที่คุณรับซื้อ USDT จากลูกค้า
+                    </p>
                 </div>
             </div>
+        </div>
         </div>
 
         <!-- Price Information Panel -->
@@ -72,13 +72,13 @@
                 <div>
                     <label class="text-sm text-gray-600 dark:text-gray-400 block mb-2">ส่วนต่างราคา (Spread)</label>
                     <p class="font-medium text-orange-600 dark:text-orange-400">
-                        ฿{{ formatCurrency(parseFloat(currentPrice.sell_price.toString()) - parseFloat(currentPrice.buy_price.toString())) }}
+                        ฿{{ formatCurrency(parseFloat(currentPrice.buy_price.toString()) - parseFloat(currentPrice.sell_price.toString())) }}
                     </p>
                 </div>
                 <div>
-                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-2">เปอร์เซ็นต์ส่วนต่าง</label>
+                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-2">เปอร์เซ็นต์กำไร</label>
                     <p class="font-medium text-orange-600 dark:text-orange-400">
-                        {{ calculateSpreadPercentage() }}%
+                        {{ calculateProfitPercentage() }}%
                     </p>
                 </div>
             </div>
@@ -133,7 +133,7 @@
                                 required
                             />
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                ราคาที่ระบบจะซื้อ USDT จากลูกค้า
+                                ราคาที่คุณขาย USDT ให้ลูกค้า (ต้องสูงกว่าราคาขาย)
                             </p>
                         </div>
 
@@ -148,11 +148,11 @@
                                 step="0.01"
                                 min="0"
                                 class="form-input w-full"
-                                placeholder="เช่น 37.00"
+                                placeholder="เช่น 30.00"
                                 required
                             />
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                ราคาที่ระบบจะขาย USDT ให้ลูกค้า
+                                ราคาที่คุณรับซื้อ USDT จากลูกค้า (ต้องต่ำกว่าราคาซื้อ)
                             </p>
                         </div>
 
@@ -160,8 +160,12 @@
                         <div v-if="formData.buy_price && formData.sell_price" class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                             <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ตัวอย่างการคำนวณ:</h4>
                             <div class="space-y-1 text-xs text-gray-600 dark:text-gray-400">
-                                <p>• ส่วนต่างราคา: ฿{{ (parseFloat(formData.sell_price) - parseFloat(formData.buy_price)).toFixed(2) }}</p>
-                                <p>• เปอร์เซ็นต์กำไร: {{ (((parseFloat(formData.sell_price) - parseFloat(formData.buy_price)) / parseFloat(formData.buy_price)) * 100).toFixed(2) }}%</p>
+                                <p>• ส่วนต่างราคา: ฿{{ (parseFloat(formData.buy_price) - parseFloat(formData.sell_price)).toFixed(2) }}</p>
+                                <p>• เปอร์เซ็นต์กำไร: {{ (((parseFloat(formData.buy_price) - parseFloat(formData.sell_price)) / parseFloat(formData.sell_price)) * 100).toFixed(2) }}%</p>
+                                <div class="mt-2 text-xs">
+                                    <p class="text-green-600 dark:text-green-400">📈 ลูกค้าซื้อ USDT: ฿{{ formData.buy_price }}</p>
+                                    <p class="text-red-600 dark:text-red-400">📉 ลูกค้าขาย USDT: ฿{{ formData.sell_price }}</p>
+                                </div>
                             </div>
                         </div>
 
@@ -273,8 +277,9 @@ const handlePriceUpdate = async () => {
             return
         }
         
-        if (sellPrice <= buyPrice) {
-            alert('ราคาขายต้องมากกว่าราคาซื้อ')
+        // ตรรกะใหม่: ราคาซื้อ (ที่คุณขายให้ลูกค้า) ต้องมากกว่าราคาขาย (ที่คุณรับซื้อจากลูกค้า)
+        if (buyPrice <= sellPrice) {
+            alert('ราคาซื้อ (ราคาที่คุณขาย USDT ให้ลูกค้า) ต้องมากกว่าราคาขาย (ราคาที่คุณรับซื้อ USDT จากลูกค้า)')
             return
         }
         
@@ -300,14 +305,14 @@ const formatCurrency = (amount: string | number) => {
     })
 }
 
-const calculateSpreadPercentage = () => {
+const calculateProfitPercentage = () => {
     if (!currentPrice.value) return '0.00'
     
     const buyPrice = parseFloat(currentPrice.value.buy_price.toString())
     const sellPrice = parseFloat(currentPrice.value.sell_price.toString())
-    const spread = ((sellPrice - buyPrice) / buyPrice) * 100
+    const profit = ((buyPrice - sellPrice) / sellPrice) * 100
     
-    return spread.toFixed(2)
+    return profit.toFixed(2)
 }
 
 // Lifecycle
