@@ -58,6 +58,19 @@
                             </li>
 
                             <li class="menu nav-item">
+                                <NuxtLink to="/wallets" class="nav-link group" @click="toggleMobileMenu">
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 shrink-0 group-hover:!text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                        </svg>
+                                        <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">
+                                            จัดการข้อมูลกระเป๋า
+                                        </span>
+                                    </div>
+                                </NuxtLink>
+                            </li>
+
+                            <li class="menu nav-item">
                                 <NuxtLink to="/usdt-price" class="nav-link group" @click="toggleMobileMenu">
                                     <div class="flex items-center">
                                         <svg class="w-5 h-5 shrink-0 group-hover:!text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
