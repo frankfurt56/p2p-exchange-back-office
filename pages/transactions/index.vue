@@ -284,7 +284,7 @@
                                     <p class="font-medium">{{ formatCurrency(selectedTransaction.exchange_rate) }}</p>
                                 </div>
 
-                                <div v-if="selectedTransaction.recipient_wallet_address">
+                                <div v-if="selectedTransaction.recipient_wallet_address && selectedTransaction.transaction_type  === 'buy'">
                                     <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">
                                         {{ selectedTransaction.transaction_type === 'buy' ? 'Wallet Address ปลายทาง' : 'Customer Wallet Address' }}
                                     </label>
@@ -293,13 +293,13 @@
 
                               
 
-                                <div v-if="selectedTransaction.usdt_from_wallet_address">
-                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">USDT From Wallet</label>
+                                <div v-if="selectedTransaction.usdt_from_wallet_address  && selectedTransaction.transaction_type  === 'sell'">
+                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">กระเป๋าที่รับเงิน USDT</label>
                                     <p class="font-mono text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded break-all">{{ selectedTransaction.usdt_from_wallet_address }}</p>
                                 </div>
 
                                 <div v-if="selectedTransaction.usdt_transfer_hash">
-                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">USDT Transfer Hash</label>
+                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">TXID</label>
                                     <p class="font-mono text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded break-all">{{ selectedTransaction.usdt_transfer_hash }}</p>
                                 </div>
                             </div>
