@@ -135,7 +135,8 @@
                                     : 'p-1.5 rounded-md text-gray-500 hover:bg-gray-100 hover:text-green-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-green-500 transition-colors'"
                                 :title="row.is_active ? 'ปิดใช้งาน' : 'เปิดใช้งาน'"
                             >
-                                <icon-power class="w-4 h-4" />
+                                <icon-x-circle v-if="row.is_active" class="w-4 h-4" />
+                                <icon-checks v-else class="w-4 h-4" />
                             </button>
                             <button 
                                 @click="deleteWallet(row.id)"
@@ -395,6 +396,9 @@ const saveWallet = async () => {
         
         filterWallets()
         closeModal()
+        
+        // Sync network status after saving wallet
+        await syncNetworkStatus(formData.value.network)
     } catch (error) {
         console.error('Error saving wallet:', error)
         alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
@@ -408,6 +412,7 @@ const toggleWalletStatus = async (id: number) => {
         const wallet = wallets.value.find(w => w.id === id)
         if (wallet) {
             const newStatus = !wallet.is_active
+            const networkToCheck = wallet.network
             
             const { error } = await supabase
                 .from('store_wallets')
@@ -423,10 +428,57 @@ const toggleWalletStatus = async (id: number) => {
             wallet.is_active = newStatus
             alert('เปลี่ยนสถานะกระเป๋าเรียบร้อยแล้ว')
             filterWallets()
+            
+            // Sync network status after changing wallet status
+            await syncNetworkStatus(networkToCheck)
         }
     } catch (error) {
         console.error('Error toggling wallet status:', error)
         alert('เกิดข้อผิดพลาดในการเปลี่ยนสถานะ')
+    }
+}
+
+const syncNetworkStatus = async (network?: string) => {
+    try {
+        // Get all active wallets by network
+        const { data: activeWalletsByNetwork, error: walletsError } = await supabase
+            .from('store_wallets')
+            .select('network')
+            .eq('is_active', true)
+
+        if (walletsError) {
+            console.error('Error checking active wallets:', walletsError)
+            return
+        }
+
+        // Get active networks from wallets
+        const activeNetworks = new Set(activeWalletsByNetwork?.map(w => w.network) || [])
+
+        // Update networks table - disable networks that have no active wallets
+        const { error: networksError } = await supabase
+            .from('networks')
+            .update({ is_active: false })
+            .not('id', 'in', `(${Array.from(activeNetworks).map(n => `'${n}'`).join(',') || "''"})`)
+
+        if (networksError) {
+            console.error('Error updating networks status:', networksError)
+            return
+        }
+
+        // Enable networks that have active wallets
+        if (activeNetworks.size > 0) {
+            const { error: enableNetworksError } = await supabase
+                .from('networks')
+                .update({ is_active: true })
+                .in('id', Array.from(activeNetworks))
+
+            if (enableNetworksError) {
+                console.error('Error enabling networks:', enableNetworksError)
+            }
+        }
+
+    } catch (error) {
+        console.error('Error syncing network status:', error)
     }
 }
 
@@ -435,6 +487,9 @@ const deleteWallet = async (id: number) => {
 
     if (confirmed) {
         try {
+            const wallet = wallets.value.find(w => w.id === id)
+            const networkToCheck = wallet?.network
+
             const { error } = await supabase
                 .from('store_wallets')
                 .delete()
@@ -451,6 +506,9 @@ const deleteWallet = async (id: number) => {
                 wallets.value.splice(index, 1)
                 alert('ลบกระเป๋าเรียบร้อยแล้ว')
                 filterWallets()
+                
+                // Sync network status after deleting wallet
+                await syncNetworkStatus(networkToCheck)
             }
         } catch (error) {
             console.error('Error deleting wallet:', error)
@@ -472,5 +530,7 @@ watch(search, filterWallets)
 // Lifecycle
 onMounted(() => {
     fetchWallets()
+    // Initial sync of network status
+    syncNetworkStatus()
 })
 </script>
