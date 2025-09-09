@@ -11,7 +11,7 @@
         </div>
 
         <!-- Stats Cards -->
-        <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div class="panel h-full">
                 <div class="flex items-center">
                     <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10 text-primary dark:bg-primary dark:text-white-light">
@@ -36,20 +36,6 @@
                     <div class="font-semibold ltr:ml-3 rtl:mr-3">
                         <p class="text-xl dark:text-white-light">{{ totalNetworks }}</p>
                         <h5 class="text-xs text-white-dark">เครือข่ายทั้งหมด</h5>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel h-full">
-                <div class="flex items-center">
-                    <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-success/10 text-success dark:bg-success dark:text-white-light">
-                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <div class="font-semibold ltr:ml-3 rtl:mr-3">
-                        <p class="text-xl dark:text-white-light">{{ lastUpdated }}</p>
-                        <h5 class="text-xs text-white-dark">อัปเดตล่าสุด</h5>
                     </div>
                 </div>
             </div>
@@ -251,17 +237,6 @@ const activeWallets = computed(() => {
 const totalNetworks = computed(() => {
     const networks = new Set(wallets.value.map(w => w.network))
     return networks.size
-})
-
-const lastUpdated = computed(() => {
-    if (wallets.value.length === 0) return 'ไม่มีข้อมูล'
-    const latest = wallets.value.reduce((latest, current) => {
-        return new Date(current.created_at_th) > new Date(latest.created_at_th) ? current : latest
-    })
-    return new Date(latest.created_at_th).toLocaleDateString('th-TH', { 
-        day: '2-digit', 
-        month: '2-digit' 
-    })
 })
 
 // Table configuration
