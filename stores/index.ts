@@ -30,7 +30,7 @@ export const useAppStore = defineStore('app', {
             { code: 'tr', name: 'Turkish' },
             { code: 'ae', name: 'Arabic' },
         ],
-        isShowMainLoader: false, // Changed to false for better production hydration
+        isShowMainLoader: true,
         semidark: false,
     }),
 

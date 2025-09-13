@@ -66,6 +66,15 @@
                 showTopButton.value = false;
             }
         };
+
+        // Auto refresh once if it's the first load and not from cache
+        if (process.client && !sessionStorage.getItem('app_refreshed')) {
+            sessionStorage.setItem('app_refreshed', 'true');
+            window.location.reload();
+        } else {
+            // หลังจากรีเฟรชแล้วให้ปิด loader
+            store.toggleMainLoader();
+        }
     });
 
     const goToTop = () => {
