@@ -169,7 +169,7 @@ const formData = ref<User>({
 const roleOptions = [
     { value: 'user', label: 'ผู้ใช้ทั่วไป' },
     { value: 'admin', label: 'ผู้ดูแลระบบ' },
-    { value: 'moderator', label: 'ผู้ควบคุม' }
+    // { value: 'moderator', label: 'ผู้ควบคุม' }
 ]
 
 // Define resetForm function first
