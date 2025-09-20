@@ -3,13 +3,13 @@
         <div class="shadow-sm">
             <div class="relative flex w-full items-center bg-white px-5 py-2.5 dark:bg-[#0e1726]">
                 <div class="horizontal-logo flex items-center justify-between ltr:mr-2 rtl:ml-2 lg:hidden">
-                    <NuxtLink to="/" class="main-logo flex shrink-0 items-center">
+                    <!-- <NuxtLink to="/" class="main-logo flex shrink-0 items-center">
                         <img class="inline w-8 ltr:-ml-1 rtl:-mr-1" src="/assets/images/logo.svg" alt="" />
                         <span
                             class="hidden align-middle text-2xl font-semibold transition-all duration-300 ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light md:inline"
                             >VRISTO</span
                         >
-                    </NuxtLink>
+                    </NuxtLink> -->
 
                     <a
                         href="javascript:;"
@@ -19,7 +19,7 @@
                         <icon-menu class="h-5 w-5" />
                     </a>
                 </div>
-        
+
                 <div
                     class="flex items-center space-x-1.5 ltr:ml-auto rtl:mr-auto rtl:space-x-reverse dark:text-[#d0d2d6] sm:flex-1 ltr:sm:ml-0 sm:rtl:mr-0 lg:space-x-2"
                 >
@@ -28,11 +28,7 @@
                             class="absolute inset-x-0 top-1/2 z-10 mx-4 hidden -translate-y-1/2 sm:relative sm:top-0 sm:mx-0 sm:block sm:translate-y-0"
                             :class="{ '!block': search }"
                             @submit.prevent="search = false"
-                        >
-                  
-                        </form>
-
-                       
+                        ></form>
                     </div>
                     <div>
                         <a
@@ -61,8 +57,7 @@
                         </a>
                     </div>
 
-
-<!-- 
+                    <!-- 
                     <div class="dropdown shrink-0">
                         <client-only>
                             <Popper :placement="store.rtlClass === 'rtl' ? 'bottom-end' : 'bottom-start'" offsetDistance="8">
@@ -145,7 +140,9 @@
                         <client-only>
                             <Popper :placement="store.rtlClass === 'rtl' ? 'bottom-end' : 'bottom-start'" offsetDistance="8" class="!block">
                                 <button type="button" class="group relative block">
-                                    <div class="h-9 w-9 rounded-full bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center text-white font-bold text-sm saturate-50 group-hover:saturate-100 transition-all duration-200">
+                                    <div
+                                        class="h-9 w-9 rounded-full bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center text-white font-bold text-sm saturate-50 group-hover:saturate-100 transition-all duration-200"
+                                    >
                                         {{ (authStore.currentUser?.username || 'Admin').charAt(0).toUpperCase() }}
                                     </div>
                                 </button>
@@ -154,13 +151,16 @@
                                         <li>
                                             <div class="flex items-center px-4 py-4">
                                                 <div class="flex-none">
-                                                    <div class="h-10 w-10 rounded-md bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center text-white font-bold text-lg">
+                                                    <div
+                                                        class="h-10 w-10 rounded-md bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center text-white font-bold text-lg"
+                                                    >
                                                         {{ (authStore.currentUser?.username || 'Admin').charAt(0).toUpperCase() }}
                                                     </div>
                                                 </div>
                                                 <div class="truncate ltr:pl-4 rtl:pr-4">
                                                     <h4 class="text-base">
-                                                        {{ authStore.currentUser?.username || 'Admin' }}<span class="rounded bg-danger-light px-1 text-xs text-danger ltr:ml-2 rtl:ml-2">ADMIN</span>
+                                                        {{ authStore.currentUser?.username || 'Admin'
+                                                        }}<span class="rounded bg-danger-light px-1 text-xs text-danger ltr:ml-2 rtl:ml-2">ADMIN</span>
                                                     </h4>
                                                     <p class="text-xs text-gray-500">{{ authStore.currentUser?.email || 'admin@p2p.com' }}</p>
                                                 </div>
@@ -184,21 +184,18 @@
             <!-- horizontal menu -->
             <ul
                 class="horizontal-menu hidden border-t border-[#ebedf2] bg-white px-6 py-1.5 font-semibold text-black rtl:space-x-reverse dark:border-[#191e3a] dark:bg-[#0e1726] dark:text-white-dark lg:space-x-1.5 xl:space-x-8"
-            >
-         
-            </ul>
+            ></ul>
         </div>
     </header>
 </template>
 
 <script lang="ts" setup>
-
     import appSetting from '@/app-setting';
 
     import { useRoute } from 'vue-router';
     import { useAppStore } from '@/stores/index';
     import { useAdminAuthStore } from '@/stores/adminAuth';
-    
+
     const store = useAppStore();
     const authStore = useAdminAuthStore();
     const route = useRoute();
@@ -289,6 +286,4 @@
             }
         }
     };
-
-
 </script>

@@ -55,6 +55,23 @@ export interface Transaction {
     accountNumber: string
   }>
   payment_slip_url?: string
+  payment_slips?: Array<{
+    url: string
+    file_name: string
+    file_size: number
+    uploaded_at: string
+  }>
+  admin_info?: {
+    id: string
+    type: 'bank' | 'wallet'
+    bank_name?: string
+    account_number?: string
+    account_name?: string
+    wallet_name?: string
+    wallet_address?: string
+    network?: string
+    qr_code_url?: string
+  }
   usdt_from_wallet_address?: string
   usdt_transfer_hash?: string
   usdt_transferred_at?: string
