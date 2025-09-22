@@ -443,27 +443,63 @@
                             v-if="
                                 selectedTransaction.customer_bank_code ||
                                 selectedTransaction.customer_account_number ||
-                                selectedTransaction.customer_receive_bank_code
+                                selectedTransaction.customer_receive_bank_code ||
+                                (selectedTransaction.customer_receive_bank_accounts && selectedTransaction.customer_receive_bank_accounts.length > 0)
                             "
                             class="space-y-4"
                         >
                             <h5 class="font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">ข้อมูลลูกค้า</h5>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-4">
                                 <!-- Customer Bank Account -->
-                                <div v-if="selectedTransaction.customer_bank_code">
-                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">บัญชีลูกค้า</label>
-                                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                                <div v-if="selectedTransaction.customer_bank_code" class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-2">บัญชีลูกค้า (สำหรับจ่าย)</label>
+                                    <div class="bg-white dark:bg-gray-700 p-3 rounded border">
                                         <p class="font-medium">{{ selectedTransaction.customer_account_name || 'ไม่ระบุ' }}</p>
                                         <p class="text-sm text-gray-600 dark:text-gray-400">{{ selectedTransaction.customer_bank_code }}</p>
                                         <p class="font-mono text-sm">{{ selectedTransaction.customer_account_number }}</p>
                                     </div>
                                 </div>
 
-                                <!-- Customer Receive Account -->
-                                <div v-if="selectedTransaction.customer_receive_bank_code">
-                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">บัญชีปลายทาง</label>
-                                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded">
+                                <!-- Customer Receive Bank Accounts (Array) -->
+                                <div v-if="selectedTransaction.customer_receive_bank_accounts && selectedTransaction.customer_receive_bank_accounts.length > 0" class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-2">
+                                        บัญชีปลายทาง ({{ selectedTransaction.customer_receive_bank_accounts.length }} บัญชี)
+                                    </label>
+                                    <div class="space-y-3">
+                                        <div 
+                                            v-for="(account, index) in selectedTransaction.customer_receive_bank_accounts" 
+                                            :key="index"
+                                            class="bg-white dark:bg-gray-700 p-3 rounded border"
+                                        >
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-1 rounded">
+                                                    บัญชีที่ {{ index + 1 }}
+                                                </span>
+                                                <span class="font-semibold text-green-600 dark:text-green-400">
+                                                    ฿{{ formatCurrency(account.amount) }}
+                                                </span>
+                                            </div>
+                                            <p class="font-medium">{{ account.accountName || 'ไม่ระบุ' }}</p>
+                                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ account.bank }}</p>
+                                            <p class="font-mono text-sm">{{ account.accountNumber }}</p>
+                                        </div>
+                                    </div>
+                                    <!-- Total Amount Summary -->
+                                    <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm text-gray-600 dark:text-gray-400">ยอดรวมทั้งหมด:</span>
+                                            <span class="font-bold text-lg text-green-600 dark:text-green-400">
+                                                ฿{{ formatCurrency(selectedTransaction.customer_receive_bank_accounts.reduce((sum, acc) => sum + parseFloat(acc.amount || '0'), 0)) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Fallback to old single account -->
+                                <div v-else-if="selectedTransaction.customer_receive_bank_code" class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-2">บัญชีปลายทาง</label>
+                                    <div class="bg-white dark:bg-gray-700 p-3 rounded border">
                                         <p class="font-medium">{{ selectedTransaction.customer_receive_account_name || 'ไม่ระบุ' }}</p>
                                         <p class="text-sm text-gray-600 dark:text-gray-400">{{ selectedTransaction.customer_receive_bank_code }}</p>
                                         <p class="font-mono text-sm">{{ selectedTransaction.customer_receive_account_number }}</p>
