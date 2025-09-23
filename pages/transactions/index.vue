@@ -524,7 +524,7 @@
                                 <!-- Payment Slips from array -->
                                 <div v-if="selectedTransaction.payment_slips && selectedTransaction.payment_slips.length > 0" class="space-y-3">
                                     <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        หลักฐานการโอน ({{ selectedTransaction.payment_slips.length }} ไฟล์)
+                                        หลักฐานการโอนลูกค้า({{ selectedTransaction.payment_slips.length }} ไฟล์)
                                     </h6>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                         <div
@@ -608,12 +608,64 @@
                                     </button>
                                 </div>
 
+                                <!-- Admin Files Section -->
+                                <div v-if="selectedTransaction.admin_files && selectedTransaction.admin_files.length > 0" class="space-y-3">
+                                    <h6 class="text-sm font-medium text-purple-700 dark:text-purple-300">
+                                        หลักฐานการโอนแอดมิน ({{ selectedTransaction.admin_files.length }} ไฟล์)
+                                    </h6>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        <div
+                                            v-for="(file, index) in selectedTransaction.admin_files"
+                                            :key="index"
+                                            class="relative group border border-purple-200 dark:border-purple-700 rounded-lg p-3 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
+                                        >
+                                            <button @click="viewImage(file.url, `หลักฐานแอดมิน ${index + 1}`)" class="w-full text-left space-y-2">
+                                                <!-- File preview thumbnail -->
+                                                <div
+                                                    class="aspect-video bg-purple-100 dark:bg-purple-900/30 rounded-md flex items-center justify-center overflow-hidden"
+                                                >
+                                                    <img
+                                                        :src="file.url"
+                                                        :alt="file.file_name"
+                                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                                        @error="handleImageError"
+                                                    />
+                                                    <div class="hidden w-full h-full items-center justify-center text-purple-400">
+                                                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path
+                                                                fill-rule="evenodd"
+                                                                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm8 6a2 2 0 11-4 0 2 2 0 014 0zm-2 4a4 4 0 00-3.464 2H16a1 1 0 001-1.53A4 4 0 0012 13z"
+                                                            />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </button>
+
+                                            <!-- Admin badge -->
+                                            <div class="absolute top-2 right-2">
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+                                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M9.12 2.162a1 1 0 011.76 0l1.572 2.972a1 1 0 00.832.585l3.347.139a1 1 0 01.564 1.765l-2.532 2.229a1 1 0 00-.337.958l.769 3.279a1 1 0 01-1.53 1.104L10 13.347l-2.575 1.846a1 1 0 01-1.53-1.104l.769-3.279a1 1 0 00-.337-.958L3.795 7.623a1 1 0 01.564-1.765l3.347-.139a1 1 0 00.832-.585L9.12 2.162z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                    Admin
+                                                </span>
+                                            </div>                                            <!-- View overlay on hover -->
+                                            <div
+                                                class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none"
+                                            >
+                                                <span class="text-white text-sm font-medium">คลิกเพื่อดู</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- No files indicator -->
                                 <div
                                     v-if="
                                         (!selectedTransaction.payment_slips || selectedTransaction.payment_slips.length === 0) &&
                                         !selectedTransaction.payment_slip_url &&
-                                        !selectedTransaction.txid_screenshot_url
+                                        !selectedTransaction.txid_screenshot_url &&
+                                        (!selectedTransaction.admin_files || selectedTransaction.admin_files.length === 0)
                                     "
                                     class="text-gray-500 dark:text-gray-400 italic"
                                 >
@@ -1240,7 +1292,7 @@
                 selectedTransactionForStatus.value.id,
                 updateData.status,
                 updateData.notes,
-                uploadedFiles.length > 0 ? uploadedFiles : undefined
+                uploadedFiles.length > 0 ? uploadedFiles : undefined,
             );
 
             // Update local state with the response from server
