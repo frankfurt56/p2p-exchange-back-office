@@ -91,6 +91,7 @@ export interface Transaction {
   admin_reviewed_by?: string
   admin_reviewed_at?: string
   admin_notes?: string
+  admin_txid?: string
   created_at: string
   created_at_th?: string
   updated_at?: string
@@ -188,7 +189,7 @@ export const adminAPI = {
     return data as Transaction[]
   },
 
-  async updateTransactionStatus(transactionId: string, status: string, adminNotes?: string, adminFiles?: Array<{url: string, file_name: string, file_size: number, uploaded_at: string}>) {
+  async updateTransactionStatus(transactionId: string, status: string, adminNotes?: string, adminFiles?: Array<{url: string, file_name: string, file_size: number, uploaded_at: string}>, adminTxid?: string) {
     const updateData: Record<string, any> = { 
       status,
       updated_at: new Date().toISOString(),
@@ -203,6 +204,10 @@ export const adminAPI = {
     
     if (adminFiles && adminFiles.length > 0) {
       updateData.admin_files = adminFiles
+    }
+
+    if (adminTxid) {
+      updateData.admin_txid = adminTxid
     }
 
     const { data, error } = await supabase

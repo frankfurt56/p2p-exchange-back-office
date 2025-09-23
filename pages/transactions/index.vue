@@ -348,6 +348,16 @@
                                         {{ selectedTransaction.usdt_transfer_hash }}
                                     </p>
                                 </div>
+
+                                <div v-if="selectedTransaction.admin_txid && selectedTransaction.transaction_type === 'sell'">
+                                    <label class="text-sm text-gray-600 dark:text-gray-400 block mb-1">TXID แอดมิน</label>
+                                    <p
+                                        class="font-mono text-sm bg-purple-100 dark:bg-purple-900/30 p-2 rounded break-all border border-purple-200 dark:border-purple-700"
+                                    >
+                                        {{ selectedTransaction.admin_txid }}
+                                    </p>
+                                    <div class="text-xs text-purple-600 dark:text-purple-400 mt-1">TXID ที่แอดมินป้อนเป็นหลักฐานการโอน USDT</div>
+                                </div>
                             </div>
                         </div>
 
@@ -643,13 +653,20 @@
 
                                             <!-- Admin badge -->
                                             <div class="absolute top-2 right-2">
-                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+                                                <span
+                                                    class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
+                                                >
                                                     <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M9.12 2.162a1 1 0 011.76 0l1.572 2.972a1 1 0 00.832.585l3.347.139a1 1 0 01.564 1.765l-2.532 2.229a1 1 0 00-.337.958l.769 3.279a1 1 0 01-1.53 1.104L10 13.347l-2.575 1.846a1 1 0 01-1.53-1.104l.769-3.279a1 1 0 00-.337-.958L3.795 7.623a1 1 0 01.564-1.765l3.347-.139a1 1 0 00.832-.585L9.12 2.162z" clip-rule="evenodd"></path>
+                                                        <path
+                                                            fill-rule="evenodd"
+                                                            d="M9.12 2.162a1 1 0 011.76 0l1.572 2.972a1 1 0 00.832.585l3.347.139a1 1 0 01.564 1.765l-2.532 2.229a1 1 0 00-.337.958l.769 3.279a1 1 0 01-1.53 1.104L10 13.347l-2.575 1.846a1 1 0 01-1.53-1.104l.769-3.279a1 1 0 00-.337-.958L3.795 7.623a1 1 0 01.564-1.765l3.347-.139a1 1 0 00.832-.585L9.12 2.162z"
+                                                            clip-rule="evenodd"
+                                                        ></path>
                                                     </svg>
                                                     Admin
                                                 </span>
-                                            </div>                                            <!-- View overlay on hover -->
+                                            </div>
+                                            <!-- View overlay on hover -->
                                             <div
                                                 class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none"
                                             >
@@ -744,11 +761,33 @@
                             ></textarea>
                         </div>
 
+                        <!-- Admin TXID - Show only for sell transactions -->
+                        <div v-if="selectedTransactionForStatus && selectedTransactionForStatus.transaction_type === 'sell'">
+                            <label class="text-sm text-gray-600 dark:text-gray-400 block mb-2">TXID หลักฐานการโอน (ไม่บังคับ)</label>
+                            <input
+                                v-model="adminTxid"
+                                type="text"
+                                placeholder="กรอก TXID ของธุรกรรม เช่น 0x1234567890abcdef..."
+                                class="form-input w-full font-mono text-sm"
+                                maxlength="100"
+                            />
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                TXID ของธุรกรรมที่ทำการโอน USDT (Hash ของ Transaction)
+                            </div>
+                        </div>
+
                         <!-- File Upload Section -->
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
-                                <label class="text-sm text-gray-600 dark:text-gray-400 block">แนบไฟล์หลักฐาน (ไม่บังคับ)</label>
+                                <label class="text-sm text-gray-600 dark:text-gray-400 block">
+                                    แนบไฟล์หลักฐาน 
+                                    <span v-if="newStatus === 'completed'" class="text-red-500">*</span>
+                                    <span v-else class="text-gray-500">(ไม่บังคับ)</span>
+                                </label>
                                 <span class="text-xs text-gray-500 dark:text-gray-400">สูงสุด 5 ไฟล์, 10MB ต่อไฟล์</span>
+                            </div>
+                            <div v-if="newStatus === 'completed'" class="text-xs text-red-600 dark:text-red-400 mb-2">
+                                กรุณาแนบไฟล์หลักฐานอย่างน้อย 1 ไฟล์สำหรับสถานะเสร็จสิ้น
                             </div>
 
                             <!-- File Upload Input -->
@@ -797,6 +836,23 @@
                                         />
                                     </svg>
                                     <span class="text-sm text-red-700 dark:text-red-300">{{ fileUploadError }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Required File Validation -->
+                            <div
+                                v-if="newStatus === 'completed' && adminFiles.length === 0"
+                                class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-3"
+                            >
+                                <div class="flex items-center">
+                                    <svg class="w-5 h-5 text-orange-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                            clip-rule="evenodd"
+                                        />
+                                    </svg>
+                                    <span class="text-sm text-orange-700 dark:text-orange-300">กรุณาแนบไฟล์หลักฐานก่อนดำเนินการ</span>
                                 </div>
                             </div>
 
@@ -894,7 +950,11 @@
                     <!-- Action Buttons -->
                     <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
                         <button @click="closeStatusModal" class="btn btn-outline-secondary" :disabled="isUpdatingStatus || isUploadingFiles">ยกเลิก</button>
-                        <button @click="confirmStatusUpdate" :disabled="!newStatus || isUpdatingStatus || isUploadingFiles" class="btn btn-warning">
+                        <button
+                            @click="confirmStatusUpdate"
+                            :disabled="!newStatus || isUpdatingStatus || isUploadingFiles || (newStatus === 'completed' && adminFiles.length === 0)"
+                            class="btn btn-warning"
+                        >
                             <span v-if="isUploadingFiles" class="inline-flex items-center">
                                 <svg class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -917,7 +977,11 @@
                                 </svg>
                                 กำลังอัพเดท...
                             </span>
-                            <span v-else>ยืนยันการเปลี่ยนสถานะ{{ adminFiles.length > 0 ? ' พร้อมไฟล์' : '' }}</span>
+                            <span v-else>
+                                <span v-if="newStatus === 'completed' && adminFiles.length === 0">จำเป็นต้องแนบไฟล์หลักฐาน</span>
+                                <span v-else-if="adminFiles.length > 0">ยืนยันการเปลี่ยนสถานะ ({{ adminFiles.length }} ไฟล์)</span>
+                                <span v-else>ยืนยันการเปลี่ยนสถานะ</span>
+                            </span>
                         </button>
                     </div>
                 </div>
@@ -990,6 +1054,7 @@
     const selectedTransactionForStatus = ref<Transaction | null>(null);
     const newStatus = ref('');
     const statusUpdateNotes = ref('');
+    const adminTxid = ref('');
     const isUpdatingStatus = ref(false);
 
     // File Upload State
@@ -1191,6 +1256,7 @@
         selectedTransactionForStatus.value = null;
         newStatus.value = '';
         statusUpdateNotes.value = '';
+        adminTxid.value = '';
         // Reset file upload state
         adminFiles.value = [];
         fileUploadError.value = '';
@@ -1261,6 +1327,12 @@
     const confirmStatusUpdate = async () => {
         if (!selectedTransactionForStatus.value || !newStatus.value) return;
 
+        // Validate required files only for completed status
+        if (newStatus.value === 'completed' && adminFiles.value.length === 0) {
+            fileUploadError.value = 'กรุณาแนบไฟล์หลักฐานก่อนดำเนินการ';
+            return;
+        }
+
         try {
             isUpdatingStatus.value = true;
 
@@ -1285,6 +1357,7 @@
             const updateData = {
                 status: newStatus.value,
                 notes: statusUpdateNotes.value,
+                admin_txid: selectedTransactionForStatus.value.transaction_type === 'sell' ? adminTxid.value : undefined,
                 admin_files: uploadedFiles, // Pass uploaded files to API
             };
 
@@ -1293,6 +1366,7 @@
                 updateData.status,
                 updateData.notes,
                 uploadedFiles.length > 0 ? uploadedFiles : undefined,
+                selectedTransactionForStatus.value.transaction_type === 'sell' ? (adminTxid.value || undefined) : undefined,
             );
 
             // Update local state with the response from server
