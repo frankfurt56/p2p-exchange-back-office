@@ -202,9 +202,11 @@
 </template>
 
 <script setup lang="ts">
+
 import { ref, onMounted } from 'vue'
 import { adminAPI, type UsdtPrice } from '~/lib/supabase'
 import { formatDate } from '~/utils/dateFormatter'
+import { toast } from '~/composables/useToast'
 
 // Page Meta
 definePageMeta({
@@ -273,25 +275,24 @@ const handlePriceUpdate = async () => {
         
         // Basic validation
         if (buyPrice <= 0 || sellPrice <= 0) {
-            alert('ราคาต้องมากกว่า 0')
+            toast.warning('ราคาต้องมากกว่า 0', 'กรุณากรอกราคาที่มากกว่า 0')
             return
         }
-        
         // ตรรกะใหม่: ราคาซื้อ (ที่คุณขายให้ลูกค้า) ต้องมากกว่าราคาขาย (ที่คุณรับซื้อจากลูกค้า)
         if (buyPrice <= sellPrice) {
-            alert('ราคาซื้อ (ราคาที่คุณขาย USDT ให้ลูกค้า) ต้องมากกว่าราคาขาย (ราคาที่คุณรับซื้อ USDT จากลูกค้า)')
+            toast.warning('ราคาซื้อควรมากกว่าราคาขาย', 'ราคาซื้อ (ที่คุณขาย USDT ให้ลูกค้า) ต้องมากกว่าราคาขาย (ที่คุณรับซื้อ USDT จากลูกค้า)')
             return
         }
         
         const updatedPrice = await adminAPI.updateUsdtPrice(buyPrice, sellPrice)
         currentPrice.value = updatedPrice
         
-        closeEditModal()
-        alert('อัพเดทราคาเรียบร้อยแล้ว')
+    closeEditModal()
+    toast.success('อัพเดทราคาเรียบร้อยแล้ว', `อัพเดทราคาซื้อ/ขาย USDT สำเร็จ`)
         
     } catch (err: any) {
         console.error('Error updating USDT price:', err)
-        alert('เกิดข้อผิดพลาดในการอัพเดทราคา: ' + (err.message || 'ไม่ทราบสาเหตุ'))
+        toast.error('เกิดข้อผิดพลาด', `เกิดข้อผิดพลาดในการอัพเดทราคา: ${err.message || 'ไม่ทราบสาเหตุ'}`)
     } finally {
         updating.value = false
     }
