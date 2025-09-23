@@ -43,7 +43,7 @@
                             {{ row.transaction_type?.charAt(0).toUpperCase() || 'T' }}
                         </div>
                         <div>
-                            <button 
+                            <button
                                 @click="viewTransactionDetails(row)"
                                 class="font-mono text-sm font-medium text-primary hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer underline hover:no-underline"
                                 :title="'คลิกเพื่อดูรายละเอียดธุรกรรม'"
@@ -462,13 +462,16 @@
                                 </div>
 
                                 <!-- Customer Receive Bank Accounts (Array) -->
-                                <div v-if="selectedTransaction.customer_receive_bank_accounts && selectedTransaction.customer_receive_bank_accounts.length > 0" class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                                <div
+                                    v-if="selectedTransaction.customer_receive_bank_accounts && selectedTransaction.customer_receive_bank_accounts.length > 0"
+                                    class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg"
+                                >
                                     <label class="text-sm text-gray-600 dark:text-gray-400 block mb-2">
                                         บัญชีปลายทาง ({{ selectedTransaction.customer_receive_bank_accounts.length }} บัญชี)
                                     </label>
                                     <div class="space-y-3">
-                                        <div 
-                                            v-for="(account, index) in selectedTransaction.customer_receive_bank_accounts" 
+                                        <div
+                                            v-for="(account, index) in selectedTransaction.customer_receive_bank_accounts"
                                             :key="index"
                                             class="bg-white dark:bg-gray-700 p-3 rounded border"
                                         >
@@ -476,9 +479,7 @@
                                                 <span class="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-1 rounded">
                                                     บัญชีที่ {{ index + 1 }}
                                                 </span>
-                                                <span class="font-semibold text-green-600 dark:text-green-400">
-                                                    ฿{{ formatCurrency(account.amount) }}
-                                                </span>
+                                                <span class="font-semibold text-green-600 dark:text-green-400"> ฿{{ formatCurrency(account.amount) }} </span>
                                             </div>
                                             <p class="font-medium">{{ account.accountName || 'ไม่ระบุ' }}</p>
                                             <p class="text-sm text-gray-600 dark:text-gray-400">{{ account.bank }}</p>
@@ -490,7 +491,14 @@
                                         <div class="flex justify-between items-center">
                                             <span class="text-sm text-gray-600 dark:text-gray-400">ยอดรวมทั้งหมด:</span>
                                             <span class="font-bold text-lg text-green-600 dark:text-green-400">
-                                                ฿{{ formatCurrency(selectedTransaction.customer_receive_bank_accounts.reduce((sum, acc) => sum + parseFloat(acc.amount || '0'), 0)) }}
+                                                ฿{{
+                                                    formatCurrency(
+                                                        selectedTransaction.customer_receive_bank_accounts.reduce(
+                                                            (sum, acc) => sum + parseFloat(acc.amount || '0'),
+                                                            0,
+                                                        ),
+                                                    )
+                                                }}
                                             </span>
                                         </div>
                                     </div>
@@ -684,6 +692,131 @@
                             ></textarea>
                         </div>
 
+                        <!-- File Upload Section -->
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <label class="text-sm text-gray-600 dark:text-gray-400 block">แนบไฟล์หลักฐาน (ไม่บังคับ)</label>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">สูงสุด 5 ไฟล์, 10MB ต่อไฟล์</span>
+                            </div>
+
+                            <!-- File Upload Input -->
+                            <div class="relative">
+                                <input
+                                    type="file"
+                                    id="adminFileUpload"
+                                    multiple
+                                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                                    @change="handleFileSelect"
+                                    class="hidden"
+                                />
+                                <label
+                                    for="adminFileUpload"
+                                    class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                                    :class="{
+                                        'border-red-300 bg-red-50 dark:bg-red-900/20': fileUploadError,
+                                        'border-blue-400 bg-blue-50 dark:bg-blue-900/20': adminFiles.length > 0,
+                                    }"
+                                >
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <svg class="w-8 h-8 mb-2 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                            ></path>
+                                        </svg>
+                                        <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                            <span class="font-semibold">คลิกเพื่ออัพโหลด</span> หรือลากวางไฟล์
+                                        </p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, WebP (สูงสุด 10MB)</p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- File Upload Error -->
+                            <div v-if="fileUploadError" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                                <div class="flex items-center">
+                                    <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                            clip-rule="evenodd"
+                                        />
+                                    </svg>
+                                    <span class="text-sm text-red-700 dark:text-red-300">{{ fileUploadError }}</span>
+                                </div>
+                            </div>
+
+                            <!-- File Preview List -->
+                            <div v-if="adminFiles.length > 0" class="space-y-3">
+                                <div class="text-sm font-medium text-gray-700 dark:text-gray-300">ไฟล์ที่เลือก ({{ adminFiles.length }})</div>
+                                <div class="grid grid-cols-1 gap-3 max-h-40 overflow-y-auto">
+                                    <div
+                                        v-for="(file, index) in adminFiles"
+                                        :key="index"
+                                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
+                                    >
+                                        <div class="flex items-center space-x-3">
+                                            <!-- File Preview Thumbnail -->
+                                            <div class="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-lg overflow-hidden flex-shrink-0">
+                                                <img
+                                                    :src="getFilePreviewUrl(file)"
+                                                    :alt="file.name"
+                                                    class="w-full h-full object-cover"
+                                                    @error="
+                                                        (e) => {
+                                                            (e.target as HTMLElement).style.display = 'none';
+                                                        }
+                                                    "
+                                                />
+                                            </div>
+
+                                            <!-- File Info -->
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white truncate" :title="file.name">
+                                                    {{ file.name }}
+                                                </p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                    {{ formatFileSize(file.size) }}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Remove Button -->
+                                        <button
+                                            @click="removeFile(index)"
+                                            class="flex-shrink-0 p-1 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                                            :title="'ลบไฟล์'"
+                                        >
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path
+                                                    fill-rule="evenodd"
+                                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                    clip-rule="evenodd"
+                                                />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Upload Progress Indicator -->
+                            <div v-if="isUploadingFiles" class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                                <div class="flex items-center">
+                                    <svg class="animate-spin w-5 h-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path
+                                            class="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                    <span class="text-sm text-blue-700 dark:text-blue-300">กำลังอัพโหลดไฟล์...</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Confirmation -->
                         <div v-if="newStatus" class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
                             <div class="flex items-start">
@@ -708,9 +841,20 @@
 
                     <!-- Action Buttons -->
                     <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <button @click="closeStatusModal" class="btn btn-outline-secondary">ยกเลิก</button>
-                        <button @click="confirmStatusUpdate" :disabled="!newStatus || isUpdatingStatus" class="btn btn-warning">
-                            <span v-if="isUpdatingStatus" class="inline-flex items-center">
+                        <button @click="closeStatusModal" class="btn btn-outline-secondary" :disabled="isUpdatingStatus || isUploadingFiles">ยกเลิก</button>
+                        <button @click="confirmStatusUpdate" :disabled="!newStatus || isUpdatingStatus || isUploadingFiles" class="btn btn-warning">
+                            <span v-if="isUploadingFiles" class="inline-flex items-center">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path
+                                        class="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    ></path>
+                                </svg>
+                                กำลังอัพโหลดไฟล์...
+                            </span>
+                            <span v-else-if="isUpdatingStatus" class="inline-flex items-center">
                                 <svg class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path
@@ -721,7 +865,7 @@
                                 </svg>
                                 กำลังอัพเดท...
                             </span>
-                            <span v-else>ยืนยันการเปลี่ยนสถานะ</span>
+                            <span v-else>ยืนยันการเปลี่ยนสถานะ{{ adminFiles.length > 0 ? ' พร้อมไฟล์' : '' }}</span>
                         </button>
                     </div>
                 </div>
@@ -761,7 +905,7 @@
 
 <script setup lang="ts">
     import { ref, computed, onMounted } from 'vue';
-    import { adminAPI, type Transaction } from '~/lib/supabase';
+    import { adminAPI, type Transaction, supabase } from '~/lib/supabase';
     import { formatDate as formatDateUtil } from '~/utils/dateFormatter';
     import DataTable from '~/components/DataTable.vue';
     import CustomDropdown from '~/components/CustomDropdown.vue';
@@ -795,6 +939,13 @@
     const newStatus = ref('');
     const statusUpdateNotes = ref('');
     const isUpdatingStatus = ref(false);
+
+    // File Upload State
+    const adminFiles = ref<File[]>([]);
+    const fileUploadError = ref('');
+    const isUploadingFiles = ref(false);
+    const maxFileSize = 10 * 1024 * 1024; // 10MB
+    const allowedFileTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
     // Table columns
     const tableColumns = [
@@ -988,6 +1139,59 @@
         selectedTransactionForStatus.value = null;
         newStatus.value = '';
         statusUpdateNotes.value = '';
+        // Reset file upload state
+        adminFiles.value = [];
+        fileUploadError.value = '';
+        isUploadingFiles.value = false;
+    };
+
+    // File Upload Methods
+    const handleFileSelect = (event: Event) => {
+        const target = event.target as HTMLInputElement;
+        if (!target.files) return;
+
+        const files = Array.from(target.files);
+        fileUploadError.value = '';
+
+        // Validate files
+        for (const file of files) {
+            if (file.size > maxFileSize) {
+                fileUploadError.value = `ไฟล์ ${file.name} มีขนาดใหญ่เกินไป (สูงสุด 10MB)`;
+                return;
+            }
+            if (!allowedFileTypes.includes(file.type)) {
+                fileUploadError.value = `ไฟล์ ${file.name} ไม่ใช่รูปภาพที่รองรับ (รองรับ: JPG, PNG, WebP)`;
+                return;
+            }
+        }
+
+        // Add files to state (limit to 5 files total)
+        const newFiles = [...adminFiles.value, ...files];
+        if (newFiles.length > 5) {
+            fileUploadError.value = 'สามารถอัพโหลดได้สูงสุด 5 ไฟล์';
+            return;
+        }
+
+        adminFiles.value = newFiles;
+        // Clear the input to allow re-selecting the same file
+        target.value = '';
+    };
+
+    const removeFile = (index: number) => {
+        adminFiles.value.splice(index, 1);
+        fileUploadError.value = '';
+    };
+
+    const formatFileSize = (bytes: number) => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    };
+
+    const getFilePreviewUrl = (file: File) => {
+        return URL.createObjectURL(file);
     };
 
     const getAvailableStatuses = (currentStatus: string) => {
@@ -1008,8 +1212,36 @@
         try {
             isUpdatingStatus.value = true;
 
-            // Update transaction status via API
-            const updatedTransaction = await adminAPI.updateTransactionStatus(selectedTransactionForStatus.value.id, newStatus.value, statusUpdateNotes.value);
+            // Upload files first if any
+            let uploadedFiles: any[] = [];
+            if (adminFiles.value.length > 0) {
+                isUploadingFiles.value = true;
+
+                try {
+                    // Use the new admin file upload function with service role
+                    uploadedFiles = await adminAPI.uploadAdminFiles(adminFiles.value);
+                } catch (uploadError) {
+                    console.error('File upload error:', uploadError);
+                    fileUploadError.value = 'เกิดข้อผิดพลาดในการอัพโหลดไฟล์';
+                    return;
+                } finally {
+                    isUploadingFiles.value = false;
+                }
+            }
+
+            // Update transaction status via API with uploaded files
+            const updateData = {
+                status: newStatus.value,
+                notes: statusUpdateNotes.value,
+                admin_files: uploadedFiles, // Pass uploaded files to API
+            };
+
+            const updatedTransaction = await adminAPI.updateTransactionStatus(
+                selectedTransactionForStatus.value.id,
+                updateData.status,
+                updateData.notes,
+                uploadedFiles.length > 0 ? uploadedFiles : undefined
+            );
 
             // Update local state with the response from server
             const transactionIndex = transactions.value.findIndex((t) => t.id === selectedTransactionForStatus.value?.id);
@@ -1018,7 +1250,7 @@
             }
 
             // Show success message
-            console.log('Status updated successfully');
+            console.log('Status updated successfully with files:', uploadedFiles);
 
             closeStatusModal();
         } catch (error) {

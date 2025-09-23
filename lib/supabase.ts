@@ -13,6 +13,10 @@ const supabaseAnonKey = typeof window !== 'undefined'
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
+// Service role client for admin operations (file uploads, etc.)
+const supabaseServiceKey = process.env.NUXT_SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tcWx2bnplYW90bWp6c2N4cGhnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTQ0MDQzMywiZXhwIjoyMDcxMDE2NDMzfQ.0YvG_8JLN_8xFdJdL2NnrvHm9vKKKczSfCJUY8fS3Qc'
+export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+
 // Types for our database tables (copied from main project)
 export interface User {
   id: string
@@ -56,6 +60,12 @@ export interface Transaction {
   }>
   payment_slip_url?: string
   payment_slips?: Array<{
+    url: string
+    file_name: string
+    file_size: number
+    uploaded_at: string
+  }>
+  admin_files?: Array<{
     url: string
     file_name: string
     file_size: number
@@ -178,7 +188,7 @@ export const adminAPI = {
     return data as Transaction[]
   },
 
-  async updateTransactionStatus(transactionId: string, status: string, adminNotes?: string) {
+  async updateTransactionStatus(transactionId: string, status: string, adminNotes?: string, adminFiles?: Array<{url: string, file_name: string, file_size: number, uploaded_at: string}>) {
     const updateData: Record<string, any> = { 
       status,
       updated_at: new Date().toISOString(),
@@ -189,6 +199,10 @@ export const adminAPI = {
     
     if (adminNotes) {
       updateData.admin_notes = adminNotes
+    }
+    
+    if (adminFiles && adminFiles.length > 0) {
+      updateData.admin_files = adminFiles
     }
 
     const { data, error } = await supabase
@@ -321,5 +335,47 @@ export const adminAPI = {
     
     if (error) throw error
     return data as UsdtPrice
+  },
+
+  // Admin file upload using regular client with proper auth
+  async uploadAdminFiles(files: File[]) {
+    const uploadedFiles = []
+    
+    for (const file of files) {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `admin_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`
+      
+      try {
+        // Use regular supabase client (user should be authenticated)
+        const { data, error } = await supabase.storage
+          .from('admin-files')
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+          })
+
+        if (error) {
+          console.error('Storage upload error:', error)
+          throw error
+        }
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('admin-files')
+          .getPublicUrl(fileName)
+
+        uploadedFiles.push({
+          url: publicUrl,
+          file_name: file.name,
+          file_size: file.size,
+          uploaded_at: new Date().toISOString()
+        })
+      } catch (error) {
+        console.error(`Failed to upload file ${file.name}:`, error)
+        throw error
+      }
+    }
+    
+    return uploadedFiles
   }
 }
