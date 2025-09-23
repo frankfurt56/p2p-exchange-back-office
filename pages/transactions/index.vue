@@ -1025,6 +1025,7 @@
     import { formatDate as formatDateUtil } from '~/utils/dateFormatter';
     import DataTable from '~/components/DataTable.vue';
     import CustomDropdown from '~/components/CustomDropdown.vue';
+    import { toast } from '~/composables/useToast';
 
     // Page Meta
     definePageMeta({
@@ -1128,6 +1129,10 @@
         } catch (err) {
             console.error('Error fetching transactions:', err);
             error.value = 'เกิดข้อผิดพลาดในการโหลดข้อมูล';
+            toast.error(
+                'โหลดข้อมูลไม่สำเร็จ',
+                'เกิดข้อผิดพลาดในการโหลดข้อมูลธุรกรรม กรุณาลองใหม่อีกครั้ง'
+            );
         } finally {
             loading.value = false;
         }
@@ -1330,6 +1335,10 @@
         // Validate required files only for completed status
         if (newStatus.value === 'completed' && adminFiles.value.length === 0) {
             fileUploadError.value = 'กรุณาแนบไฟล์หลักฐานก่อนดำเนินการ';
+            toast.warning(
+                'จำเป็นต้องแนบไฟล์หลักฐาน',
+                'กรุณาแนบไฟล์หลักฐานอย่างน้อย 1 ไฟล์สำหรับสถานะเสร็จสิ้น'
+            );
             return;
         }
 
@@ -1347,6 +1356,10 @@
                 } catch (uploadError) {
                     console.error('File upload error:', uploadError);
                     fileUploadError.value = 'เกิดข้อผิดพลาดในการอัพโหลดไฟล์';
+                    toast.error(
+                        'อัพโหลดไฟล์ไม่สำเร็จ',
+                        'เกิดข้อผิดพลาดในการอัพโหลดไฟล์หลักฐาน กรุณาลองใหม่อีกครั้ง'
+                    );
                     return;
                 } finally {
                     isUploadingFiles.value = false;
@@ -1376,13 +1389,28 @@
             }
 
             // Show success message
-            console.log('Status updated successfully with files:', uploadedFiles);
+            const statusText = getStatusText(newStatus.value);
+            const orderRef = selectedTransactionForStatus.value.order_reference || 'N/A';
+            
+            if (uploadedFiles.length > 0) {
+                toast.success(
+                    'อัพเดทสถานะเรียบร้อย',
+                    `เปลี่ยนสถานะธุรกรรม ${orderRef} เป็น "${statusText}" พร้อมไฟล์หลักฐาน ${uploadedFiles.length} ไฟล์`
+                );
+            } else {
+                toast.success(
+                    'อัพเดทสถานะเรียบร้อย',
+                    `เปลี่ยนสถานะธุรกรรม ${orderRef} เป็น "${statusText}"`
+                );
+            }
 
             closeStatusModal();
         } catch (error) {
             console.error('Error updating status:', error);
-            // You might want to show an error toast notification here
-            alert('เกิดข้อผิดพลาดในการอัพเดทสถานะ');
+            toast.error(
+                'เกิดข้อผิดพลาด',
+                'ไม่สามารถอัพเดทสถานะธุรกรรมได้ กรุณาลองใหม่อีกครั้ง'
+            );
         } finally {
             isUpdatingStatus.value = false;
         }

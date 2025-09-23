@@ -77,6 +77,9 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Toast Notifications -->
+        <ToastContainer />
     </div>
 </template>
 <script setup lang="ts">

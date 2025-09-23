@@ -224,6 +224,7 @@ import DataTable from '~/components/DataTable.vue'
 import UserModal from '~/components/UserModal.vue'
 import CustomDropdown from '~/components/CustomDropdown.vue'
 import ConfirmDialog from '~/components/ConfirmDialog.vue'
+import { toast } from '~/composables/useToast'
 
 // Page Meta
 definePageMeta({
@@ -311,15 +312,6 @@ const roleFilterOptions = [
 ]
 
 
-const toast = {
-    success: (message: string) => {
-        alert(message) 
-    },
-    error: (message: string) => {
-        alert(message)
-    }
-}
-
 const toggleUserStatus = async (user: any) => {
     try {
         const newStatus = !user.is_active
@@ -330,10 +322,10 @@ const toggleUserStatus = async (user: any) => {
         user.is_active = newStatus
         
         const status = newStatus ? 'เปิดใช้งาน' : 'ระงับ'
-        toast.success(`${status}ผู้ใช้ ${user.username} เรียบร้อยแล้ว`)
+        toast.success(`${status}ผู้ใช้เรียบร้อยแล้ว`, `${status}ผู้ใช้ ${user.username} เรียบร้อยแล้ว`)
     } catch (error) {
         console.error('Error toggling user status:', error)
-        toast.error('เกิดข้อผิดพลาดในการเปลี่ยนสถานะผู้ใช้')
+        toast.error('เกิดข้อผิดพลาดในการเปลี่ยนสถานะ', 'ไม่สามารถเปลี่ยนสถานะผู้ใช้ได้ กรุณาลองใหม่อีกครั้ง')
     }
 }
 
@@ -365,7 +357,7 @@ const confirmDeleteUser = async () => {
         
         if (error) {
             console.error('Error deleting user:', error)
-            alert('เกิดข้อผิดพลาดในการลบผู้ใช้: ' + error.message)
+            toast.error('ลบผู้ใช้ไม่สำเร็จ', `เกิดข้อผิดพลาดในการลบผู้ใช้: ${error.message}`)
             return
         }
         
@@ -377,11 +369,11 @@ const confirmDeleteUser = async () => {
         // Refresh users list
         await fetchUsers()
         
-        alert(`ลบผู้ใช้ '${userToDelete.value.username}' เรียบร้อยแล้ว`)
+        toast.success('ลบผู้ใช้เรียบร้อยแล้ว', `ลบผู้ใช้ '${userToDelete.value.username}' เรียบร้อยแล้ว`)
         
     } catch (error) {
         console.error('Error deleting user:', error)
-        alert('เกิดข้อผิดพลาดในการลบผู้ใช้')
+        toast.error('เกิดข้อผิดพลาดในการลบผู้ใช้', 'ไม่สามารถลบผู้ใช้ได้ กรุณาลองใหม่อีกครั้ง')
     } finally {
         deletingUser.value = false
         userToDelete.value = null
@@ -414,7 +406,7 @@ const fetchUsers = async () => {
         
         if (error) {
             console.error('Supabase error:', error)
-            alert('เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้: ' + error.message)
+            toast.error('โหลดข้อมูลไม่สำเร็จ', `เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้: ${error.message}`)
             return
         }
         
@@ -424,7 +416,7 @@ const fetchUsers = async () => {
         
     } catch (error) {
         console.error('Error fetching users:', error)
-        alert('เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้')
+        toast.error('โหลดข้อมูลไม่สำเร็จ', 'เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้ กรุณาลองใหม่อีกครั้ง')
     } finally {
         loading.value = false
     }
@@ -474,9 +466,9 @@ const createUserFromModal = async (userData: any) => {
         if (error) {
             console.error('Error creating user:', error)
             if (error.code === '23505') {
-                alert('ชื่อผู้ใช้นี้มีอยู่แล้ว กรุณาเลือกชื่อผู้ใช้อื่น')
+                toast.warning('ชื่อผู้ใช้ซ้ำ', 'ชื่อผู้ใช้นี้มีอยู่แล้ว กรุณาเลือกชื่อผู้ใช้อื่น')
             } else {
-                alert('เกิดข้อผิดพลาดในการสร้างผู้ใช้: ' + error.message)
+                toast.error('สร้างผู้ใช้ไม่สำเร็จ', `เกิดข้อผิดพลาดในการสร้างผู้ใช้: ${error.message}`)
             }
             return
         }
@@ -484,7 +476,7 @@ const createUserFromModal = async (userData: any) => {
         console.log('User created successfully:', data)
         closeModal()
         await fetchUsers()
-        alert('สร้างผู้ใช้เรียบร้อยแล้ว')
+        toast.success('สร้างผู้ใช้เรียบร้อยแล้ว', `เพิ่มผู้ใช้ '${userData.username}' เข้าสู่ระบบเรียบร้อยแล้ว`)
         
     } catch (error) {
         console.error('Error creating user:', error)
@@ -516,18 +508,18 @@ const updateUserFromModal = async (userData: any) => {
         
         if (error) {
             console.error('Error updating user:', error)
-            alert('เกิดข้อผิดพลาดในการอัพเดตผู้ใช้: ' + error.message)
+            toast.error('อัพเดตผู้ใช้ไม่สำเร็จ', `เกิดข้อผิดพลาดในการอัพเดตผู้ใช้: ${error.message}`)
             return
         }
         
         console.log('User updated successfully')
         closeModal()
         await fetchUsers()
-        alert('อัพเดตข้อมูลผู้ใช้เรียบร้อยแล้ว')
+        toast.success('อัพเดตข้อมูลเรียบร้อยแล้ว', `อัพเดตข้อมูลผู้ใช้ '${userData.username}' เรียบร้อยแล้ว`)
         
     } catch (error) {
         console.error('Error updating user:', error)
-        alert('เกิดข้อผิดพลาดในการอัพเดตผู้ใช้')
+        toast.error('อัพเดตผู้ใช้ไม่สำเร็จ', 'เกิดข้อผิดพลาดในการอัพเดตผู้ใช้ กรุณาลองใหม่อีกครั้ง')
     } finally {
         creatingUser.value = false
     }
@@ -574,7 +566,7 @@ const createUser = async () => {
         // Refresh users list
         await fetchUsers()
         
-        alert('สร้างผู้ใช้เรียบร้อยแล้ว')
+        toast.success('สร้างผู้ใช้เรียบร้อยแล้ว', `เพิ่มผู้ใช้ '${newUser.value.username}' เข้าสู่ระบบเรียบร้อยแล้ว`)
         
     } catch (error) {
         console.error('Error creating user:', error)
